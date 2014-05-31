@@ -6,6 +6,7 @@ import arhangel.dim.pixeltank.messages.AckMessage;
 import arhangel.dim.pixeltank.messages.DeltaMessage;
 import arhangel.dim.pixeltank.messages.Message;
 import arhangel.dim.pixeltank.messages.MoveCommandMessage;
+import arhangel.dim.pixeltank.messages.SnapshotMessage;
 import arhangel.dim.pixeltank.protocol.ClientConnectionHandler;
 import arhangel.dim.pixeltank.protocol.Protocol;
 import arhangel.dim.pixeltank.protocol.SimpleProtocol;
@@ -70,49 +71,41 @@ public class GameServer implements ConnectionListener {
         }
     }
 
+    public void broadcast(Message message) throws IOException {
+        for (Map.Entry<Integer, GameConnection> entry : handlers.entrySet()) {
+            entry.getValue().send(message);
+        }
+    }
+
     @Override
     public void onMessageReceived(Message message) {
         try {
             int senderId = message.getSenderId();
-            logger.info("Handle message from {}: {}", senderId, message);
             int type = message.getType();
             GameConnection conn;
             switch (type) {
                 case Message.MESSAGE_LOGON:
                     conn = handlers.get(senderId);
-                    conn.send(new AckMessage());
-                    Unit unit = new Unit();
-                    unit.id = senderId;
-                    unit.x = 50;
-                    unit.y = 60;
-                    scene.addUnit(unit);
+                    if (scene.generateUnit(senderId) != null) {
+                        conn.send(new AckMessage(AckMessage.STATUS_SUCCESS));
+                        conn.send(new SnapshotMessage(scene));
+                    } else {
+                        conn.send(new AckMessage(AckMessage.STATUS_FAILED));
+                    }
                     break;
                 case Message.MESSAGE_CMD_MOVE:// TODO: broadcast
                     conn = handlers.get(senderId);
-                    MoveCommandMessage moveCmd = (MoveCommandMessage) message;
-                    int dir = moveCmd.getDirection();
-                    unit = scene.getUnit(senderId);
+                    MoveCommandMessage moveCmdMessage = (MoveCommandMessage) message;
+                    Unit unit = scene.getUnit(senderId);
                     if (unit == null) {
                         logger.warn("Unknown unit: " + senderId);
                         return;
                     }
-                    switch (dir) {
-                        case MoveCommandMessage.MOVE_DOWN:
-                            unit.y += 5;
-                            break;
-                        case MoveCommandMessage.MOVE_UP:
-                            unit.y -= 5;
-                            break;
-                        case MoveCommandMessage.MOVE_LEFT:
-                            unit.x -= 5;
-                            break;
-                        case MoveCommandMessage.MOVE_RIGHT:
-                            unit.x += 5;
-                            break;
+                    if (unit.execute(moveCmdMessage.getCommand())) {
+                        DeltaMessage delta = new DeltaMessage();
+                        delta.addUnit(unit);
+                        broadcast(delta);
                     }
-                    DeltaMessage delta = new DeltaMessage();
-                    delta.addUnit(unit);
-                    conn.send(delta);
                     break;
             }
         } catch (IOException e) {

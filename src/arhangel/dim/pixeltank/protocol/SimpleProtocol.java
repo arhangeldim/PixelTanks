@@ -5,6 +5,7 @@ import arhangel.dim.pixeltank.messages.DeltaMessage;
 import arhangel.dim.pixeltank.messages.LogonMessage;
 import arhangel.dim.pixeltank.messages.Message;
 import arhangel.dim.pixeltank.messages.MoveCommandMessage;
+import arhangel.dim.pixeltank.messages.SnapshotMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +79,11 @@ public class SimpleProtocol implements Protocol {
             case Message.MESSAGE_DELTA:
                 message = new DeltaMessage(packet);
                 break;
+            case Message.MESSAGE_SNAPSHOT:
+                message = new SnapshotMessage(packet);
+                break;
             default:
+                throw new MessageDecodingException("Unknown message type: " + type);
         }
         logger.info("decode: {}, {}", header, message);
         return message;

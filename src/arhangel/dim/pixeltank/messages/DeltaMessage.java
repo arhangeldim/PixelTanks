@@ -42,7 +42,6 @@ public class DeltaMessage extends Message {
         buffer.position(pos);
         buffer.put(MESSAGE_DELTA);
         buffer.putInt(units.size());
-        System.out.println("buf size: " + buffer.capacity() + ", pos:" + buffer.position());
         for (Unit u : units) {
             buffer.putInt(u.pack());
         }

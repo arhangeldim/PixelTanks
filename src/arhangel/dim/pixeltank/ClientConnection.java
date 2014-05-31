@@ -88,7 +88,7 @@ public class ClientConnection implements GameConnection {
                             listener.onMessageReceived(message);
                         }
                     } catch (MessageDecodingException e) {
-                        e.printStackTrace();
+                        logger.error("Failed to process input message: {}", e.getMessage());
                     }
                 }
             } catch (IOException e) {
