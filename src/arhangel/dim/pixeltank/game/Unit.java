@@ -2,11 +2,84 @@ package arhangel.dim.pixeltank.game;
 
 /****/
 public class Unit {
-    public int id;
-    public short x;
-    public short y;
-    public int vx;
-    public int vy;// 10 10 12
+    private Scene scene;
+    private int id;
+    private int x;
+    private int y;
+    private int vx;
+    private int vy;// 10 10 12
+
+    public Unit() {
+    }
+
+    public Unit(Scene scene, int id, int x, int y, int vx, int vy) {
+        this.scene = scene;
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public boolean execute(UnitCommand cmd) {
+        switch (cmd) {
+            case MOVE_DOWN:
+                if (scene.isValidPosition(x, y + vy)) {
+                    y += vy;
+                    return true;
+                }
+                break;
+            case MOVE_UP:
+                if (scene.isValidPosition(x, y - vy)) {
+                    y -= vy;
+                    return true;
+                }
+                break;
+            case MOVE_LEFT:
+                if (scene.isValidPosition(x - vx, y)) {
+                    x -= vx;
+                    return true;
+                }
+                break;
+            case MOVE_RIGHT:
+                if (scene.isValidPosition(x + vx, y)) {
+                    x += vy;
+                    return true;
+                }
+                break;
+            case FIRE:
+                System.out.println("Baabah!");
+                break;
+            default:
+                System.out.println("UNknown command: " + cmd);
+
+        }
+        return false;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public int pack() {
         if (!validate()) {
@@ -32,7 +105,6 @@ public class Unit {
     }
 
     @Override
-
     public String toString() {
         return "Unit{" + "id=" + id + ", x=" + x + ", y=" + y + ", vx=" + vx + ", vy=" + vy + '}';
     }
