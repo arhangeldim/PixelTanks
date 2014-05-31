@@ -52,7 +52,7 @@ public class ClientConnectionHandler implements GameConnection {
                     logger.error("Failed to read from socket.");
                 } finally {
                     server.removeHandler(clientlId);
-                    //interrupt();
+//                    interrupt();
                 }
             }
         });

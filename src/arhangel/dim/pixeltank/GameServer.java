@@ -53,6 +53,9 @@ public class GameServer implements ConnectionListener {
 
     public void stop() {
         isRunning = false;
+        for (Map.Entry<Integer, GameConnection> entry : handlers.entrySet()) {
+            entry.getValue().stop();
+        }
     }
 
     public Protocol getProtocol() {
@@ -93,8 +96,7 @@ public class GameServer implements ConnectionListener {
                         conn.send(new AckMessage(AckMessage.STATUS_FAILED));
                     }
                     break;
-                case Message.MESSAGE_CMD_MOVE:// TODO: broadcast
-                    conn = handlers.get(senderId);
+                case Message.MESSAGE_CMD_MOVE:
                     MoveCommandMessage moveCmdMessage = (MoveCommandMessage) message;
                     Unit unit = scene.getUnit(senderId);
                     if (unit == null) {
@@ -113,9 +115,18 @@ public class GameServer implements ConnectionListener {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         int port = 19000;
-        GameServer server = new GameServer(port);
-        server.start();
+        GameServer server = null;
+        try {
+            server = new GameServer(port);
+            server.start();
+
+        } catch (IOException e) {
+            logger.error("Server failed: {}\nShutting down.", e.getMessage());
+            if (server != null) {
+                server.stop();
+            }
+        }
     }
 }
