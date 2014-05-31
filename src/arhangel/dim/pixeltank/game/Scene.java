@@ -52,6 +52,10 @@ public class Scene {
         return false;
     }
 
+    public void addUnit(int clientId, Unit unit) {
+        units.put(clientId, unit);
+    }
+
 
     public Collection<Unit> getAllUnits() {
         return units.values();
