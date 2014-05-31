@@ -120,8 +120,14 @@ public class MoveSquareFrame extends JFrame implements ConnectionListener {
                     return;
                 }
                 DeltaMessage deltaMessage = (DeltaMessage) message;
-                Unit delta = (Unit) deltaMessage.getUnits().toArray()[0];
-                scene.updateUnit(delta.getId(), delta);
+                for (Unit unit : deltaMessage.getUnits()) {
+
+                    // TODO: have to generate new message(added new player) instead of adding
+                    // broadcast logon info about new users
+                    if (!scene.updateUnit(unit.getId(), unit)) {
+                        scene.addUnit(unit.getId(), unit);
+                    }
+                }
                 repaint();
                 break;
             default:
