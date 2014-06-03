@@ -67,7 +67,7 @@ public class Unit {
                 System.out.println("Baabah!");
                 break;
             default:
-                System.out.println("UNknown command: " + cmd);
+                System.out.println("Unknown command: " + cmd);
 
         }
         return false;
