@@ -15,7 +15,8 @@ public class SnapshotMessage extends Message {
 
     public SnapshotMessage(ByteBuffer packed) {
         type = packed.get();
-        scene = new Scene();
+        // tiled W, H, tile size
+        scene = new Scene(packed.get(), packed.get(), packed.get());
         int size = packed.getInt();
         for (int i = 0; i < size; i++) {
             Unit unit = new Unit();
@@ -34,13 +35,16 @@ public class SnapshotMessage extends Message {
 
     @Override
     public int getSize() {
-        return 1 + 4 + 4 * scene.getAllUnits().size();
+        return 1 + 4 + 3 +  4 * scene.getAllUnits().size();
     }
 
     @Override
     public void packTo(ByteBuffer buffer, int pos) {
         buffer.position(pos);
         buffer.put(MESSAGE_SNAPSHOT);
+        buffer.put((byte) scene.getTiledWidth());
+        buffer.put((byte) scene.getTiledHeight());
+        buffer.put((byte) scene.getTileSize());
         buffer.putInt(scene.getAllUnits().size());
         for (Unit u : scene.getAllUnits()) {
             buffer.putInt(u.pack());

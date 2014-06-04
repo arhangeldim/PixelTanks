@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 public class SnapshotMessageTest {
     @Test
     public void testPackTo() throws Exception {
-        Scene scene = new Scene();
+        Scene scene = new Scene(20, 20, 10);
         scene.generateUnit(0);
         scene.generateUnit(1);
         SnapshotMessage message = new SnapshotMessage(scene);

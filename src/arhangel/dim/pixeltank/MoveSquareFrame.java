@@ -1,8 +1,8 @@
 package arhangel.dim.pixeltank;
 
+import arhangel.dim.pixeltank.game.Direction;
 import arhangel.dim.pixeltank.game.Scene;
 import arhangel.dim.pixeltank.game.Unit;
-import arhangel.dim.pixeltank.game.UnitCommand;
 import arhangel.dim.pixeltank.messages.AckMessage;
 import arhangel.dim.pixeltank.messages.DeltaMessage;
 import arhangel.dim.pixeltank.messages.LogonMessage;
@@ -48,7 +48,7 @@ public class MoveSquareFrame extends JFrame implements ConnectionListener {
                 }
             }
         });// Set up a custom drawing
-        JPanel canvas = new DrawCanvas();
+        canvas = new DrawCanvas();
         canvas.setPreferredSize(new Dimension(CANVAS_WIDTH, CANVAS_HEIGHT));
         Container cp = getContentPane();
         cp.setLayout(new BorderLayout());
@@ -65,19 +65,19 @@ public class MoveSquareFrame extends JFrame implements ConnectionListener {
                 try {
                     switch (evt.getKeyCode()) {
                         case KeyEvent.VK_LEFT:
-                            Message m = new MoveCommandMessage(UnitCommand.MOVE_LEFT);
+                            Message m = new MoveCommandMessage(Direction.LEFT);
                             clientConnection.send(m);//x1 -= 5;repaint();
                             break;
                         case KeyEvent.VK_RIGHT:
-                            m = new MoveCommandMessage(UnitCommand.MOVE_RIGHT);
+                            m = new MoveCommandMessage(Direction.RIGHT);
                             clientConnection.send(m);//x1 += 10;repaint();
                             break;
                         case KeyEvent.VK_DOWN:
-                            m = new MoveCommandMessage(UnitCommand.MOVE_DOWN);
+                            m = new MoveCommandMessage(Direction.DOWN);
                             clientConnection.send(m);//y1 += 10;repaint();
                             break;
                         case KeyEvent.VK_UP:
-                            m = new MoveCommandMessage(UnitCommand.MOVE_UP);
+                            m = new MoveCommandMessage(Direction.UP);
                             clientConnection.send(m);//y1 -= 10;repaint();
                             break;
                     }
@@ -112,6 +112,9 @@ public class MoveSquareFrame extends JFrame implements ConnectionListener {
                 }
                 SnapshotMessage snapshotMessage = (SnapshotMessage) message;
                 scene = snapshotMessage.getScene();
+                System.out.println(canvas);
+                System.out.println(scene);
+                canvas.setPreferredSize(new Dimension(scene.getWidth(), scene.getHeight()));
                 repaint();
                 break;
             case Message.MESSAGE_DELTA:

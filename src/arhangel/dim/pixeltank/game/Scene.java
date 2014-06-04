@@ -12,34 +12,94 @@ import java.util.Map;
 public class Scene {
     Logger logger = LoggerFactory.getLogger(Scene.class);
 
-    public static final int WIDTH = 600;
-    public static final int HEIGHT = 500;
+    private int width, height;
+    private int tileSize;
+    private int tiledWidth, tiledHeight;
+    private Tile[][] tiles;
 
-    private int width;
-    private int height;
-    private Terrain[][] tails;
+    private static final int UNIT_SIZE = 20;
+
+    public Scene(int tiledWidth, int tiledHeight, int tileSize) {
+        this.width = tileSize * tiledWidth;
+        this.height = tileSize * tiledHeight;
+        this.tileSize = tileSize;
+        this.tiledWidth = tiledWidth;
+        this.tiledHeight = tiledHeight;
+        tiles = new Tile[tiledWidth][tiledHeight];
+        generateScene();
+    }
+
+
+    public int getTileSize() {
+        return tileSize;
+    }
+
+    public void setTileSize(int tileSize) {
+        this.tileSize = tileSize;
+    }
+
+    public int getTiledWidth() {
+        return tiledWidth;
+    }
+
+    public void setTiledWidth(int tiledWidth) {
+        this.tiledWidth = tiledWidth;
+    }
+
+    public int getTiledHeight() {
+        return tiledHeight;
+    }
+
+    public void setTiledHeight(int tiledHeight) {
+        this.tiledHeight = tiledHeight;
+    }
+
+    // TODO: check this !
+    public Tile getTile(int x, int y) {
+        int xPos = (x) / tileSize;
+        int yPos = (y) / tileSize;
+        Tile tile = tiles[xPos][yPos];
+        logger.info("({}, {}) -> {}", x, y, tile);
+        return tile;
+    }
+
 
     private Map<Integer, Unit> units = new HashMap<>();
     Terrain groundTerrain = new Terrain(1, false, new Texture(Color.GRAY));
 
 
-    public Scene() {
-        width = WIDTH;
-        height = HEIGHT;
-        generateScene();
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     private void generateScene() {
-        tails = new Terrain[width][height];
+        tiles = new Tile[width][height];
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                tails[i][j] = groundTerrain;
+                tiles[i][j] = new Tile(tileSize, i, j, false);
             }
+        }
+
+        for (int i = 3; i < 7; i++) {
+            tiles[i][4].isBlocked = true;
+
         }
     }
 
     public Unit generateUnit(int clientId) {
-        Unit unit = new Unit(this, clientId, 100, 100, 5, 5);
+        Unit unit = new Unit(clientId, new Position(100, 100), 5, UNIT_SIZE);
         units.put(clientId, unit);
         return unit;
     }
@@ -81,16 +141,35 @@ public class Scene {
         return "Scene{" +
                 "width=" + width +
                 ", height=" + height +
+                ", tileSize=" + tileSize +
+                ", tiledWidth=" + tiledWidth +
+                ", tiledHeight=" + tiledHeight +
                 ", units=" + units +
                 '}';
     }
 
     public void paint(Component component, Graphics g) {
-        component.setBackground(groundTerrain.getTexture().getColor());
+        component.setBackground(Color.WHITE);
+        for (int i = 0; i < tiledWidth; i++) {
+            for (int j = 0; j < tiledHeight; j++) {
+                g.setColor((i + j) % 2 == 0 ? Color.BLUE : Color.BLACK);
+                Tile t = tiles[i][j];
+                if (t.isBlocked) {
+                    g.setColor(Color.BLACK);
+                    g.fillRect(t.x * tileSize, t.y * tileSize, t.tileSize, t.tileSize);
+                }
+                g.setColor(Color.BLUE);
+                g.drawRect(t.x * tileSize, t.y * tileSize, t.tileSize, t.tileSize);
+            }
+        }
+
+
+        //component.setBackground(groundTerrain.getTexture().getColor());
         for (Map.Entry<Integer, Unit> entry : units.entrySet()) {
             Unit unit = entry.getValue();
             g.setColor(Color.BLUE);
-            g.fillRect(unit.getX(), unit.getY(), 10, 10);
+            Position pos = unit.getPosition();
+            g.fillRect(pos.x, pos.y, UNIT_SIZE, UNIT_SIZE);
         }
     }
 }

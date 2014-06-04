@@ -1,77 +1,63 @@
 package arhangel.dim.pixeltank.game;
 
 /****/
-public class Unit {
-    private Scene scene;
+public class Unit implements GameObject {
     private int id;
-    private int x;
-    private int y;
-    private int vx;
-    private int vy;// 10 10 12
+    private int size;
+    private Direction direction;
+    private Position position;
+    private int velocity;
 
     public Unit() {
     }
 
-    public Unit(Scene scene, int id, int x, int y, int vx, int vy) {
-        this.scene = scene;
+    public Unit(int id, Position position, int velocity, int size) {
         this.id = id;
-        this.x = x;
-        this.y = y;
-        this.vx = vx;
-        this.vy = vy;
+        this.position = position;
+        this.velocity = velocity;
+        this.size = size;
     }
 
-    public int getX() {
-        return x;
+    @Override
+    public Position getPosition() {
+        return position;
     }
 
-    public void setX(int x) {
-        this.x = x;
+    @Override
+    public void setPosition(Position position) {
+        this.position = position;
     }
 
-    public int getY() {
-        return y;
+    @Override
+    public int getSize() {
+        return size;
     }
 
-    public void setY(int y) {
-        this.y = y;
+    @Override
+    public void setSize(int size) {
+        this.size = size;
     }
 
-    public boolean execute(UnitCommand cmd) {
-        switch (cmd) {
-            case MOVE_DOWN:
-                if (scene.isValidPosition(x, y + vy)) {
-                    y += vy;
-                    return true;
-                }
-                break;
-            case MOVE_UP:
-                if (scene.isValidPosition(x, y - vy)) {
-                    y -= vy;
-                    return true;
-                }
-                break;
-            case MOVE_LEFT:
-                if (scene.isValidPosition(x - vx, y)) {
-                    x -= vx;
-                    return true;
-                }
-                break;
-            case MOVE_RIGHT:
-                if (scene.isValidPosition(x + vx, y)) {
-                    x += vy;
-                    return true;
-                }
-                break;
-            case FIRE:
-                System.out.println("Baabah!");
-                break;
-            default:
-                System.out.println("Unknown command: " + cmd);
-
-        }
-        return false;
+    @Override
+    public Direction getDirection() {
+        return direction;
     }
+
+    @Override
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
+
+    @Override
+    public void setVelocity(int v) {
+        this.velocity = v;
+    }
+
+    @Override
+    public int getVelocity() {
+        return velocity;
+    }
+
 
     public int getId() {
         return id;
@@ -87,25 +73,33 @@ public class Unit {
         }
         int packed = 0;
         packed |= id & 0xfff;
-        packed |= ((int) x) << 12;
-        packed |= ((int) y) << 22;
+        packed |= ((int) position.x) << 12;
+        packed |= ((int) position.y) << 22;
         return packed;
     }
 
     private boolean validate() {
-        return (id < 0x1000) && (x < 0x400) && (y < 0x400);
+        return (id < 0x1000) && (position.x < 0x400) && (position.y < 0x400);
     }
 
     public void unpack(long packed) {
         if (packed >= 0) {
+
             id = (short) (packed & 0xfff);
-            x = (short) ((packed >> 12) & 0x3ff);
-            y = (short) ((packed >> 22) & 0x3ff);
+            int x = (int)((packed >> 12) & 0x3ff);
+            int y = (int) ((packed >> 22) & 0x3ff);
+            position = new Position(x, y);
         }
     }
 
     @Override
     public String toString() {
-        return "Unit{" + "id=" + id + ", x=" + x + ", y=" + y + ", vx=" + vx + ", vy=" + vy + '}';
+        return "Unit{" +
+                "id=" + id +
+                ", size=" + size +
+                ", direction=" + direction +
+                ", position=" + position +
+                ", velocity=" + velocity +
+                '}';
     }
 }

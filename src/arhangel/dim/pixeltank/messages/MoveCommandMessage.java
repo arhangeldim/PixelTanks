@@ -1,29 +1,29 @@
 package arhangel.dim.pixeltank.messages;
 
-import arhangel.dim.pixeltank.game.UnitCommand;
+import arhangel.dim.pixeltank.game.Direction;
 
 import java.nio.ByteBuffer;
 
 /****/
 public class MoveCommandMessage extends Message {
-    private UnitCommand command;
+    private Direction direction;
 
-    public MoveCommandMessage(UnitCommand cmd) {
-        this.command = cmd;
+    public MoveCommandMessage(Direction cmd) {
+        this.direction = cmd;
     }
 
     public MoveCommandMessage(ByteBuffer packed) {
         type = packed.get();
         byte code = packed.get();
-        command = UnitCommand.byCode(code);
+        direction = Direction.byCode(code);
     }
 
-    public UnitCommand getCommand() {
-        return command;
+    public Direction getDirection() {
+        return direction;
     }
 
-    public void setCommand(UnitCommand command) {
-        this.command = command;
+    public void setDirection(Direction direction) {
+        this.direction = direction;
     }
 
     @Override
@@ -35,11 +35,11 @@ public class MoveCommandMessage extends Message {
     public void packTo(ByteBuffer buffer, int pos) {
         buffer.position(pos);
         buffer.put(MESSAGE_CMD_MOVE);
-        buffer.put((byte) command.getCode());
+        buffer.put((byte) direction.getCode());
     }
 
     @Override
     public String toString() {
-        return "MoveCommandMessage{" + "execute=" + command.getCode() + '}';
+        return "MoveCommandMessage{" + "execute=" + direction.getCode() + '}';
     }
 }

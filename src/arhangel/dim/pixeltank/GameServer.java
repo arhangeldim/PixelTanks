@@ -1,11 +1,10 @@
 package arhangel.dim.pixeltank;
 
 import arhangel.dim.pixeltank.game.Scene;
-import arhangel.dim.pixeltank.game.Unit;
+import arhangel.dim.pixeltank.game.controller.InputController;
+import arhangel.dim.pixeltank.game.controller.PhysicalController;
 import arhangel.dim.pixeltank.messages.AckMessage;
-import arhangel.dim.pixeltank.messages.DeltaMessage;
 import arhangel.dim.pixeltank.messages.Message;
-import arhangel.dim.pixeltank.messages.MoveCommandMessage;
 import arhangel.dim.pixeltank.messages.SnapshotMessage;
 import arhangel.dim.pixeltank.protocol.ClientConnectionHandler;
 import arhangel.dim.pixeltank.protocol.Protocol;
@@ -30,6 +29,8 @@ public class GameServer implements ConnectionListener {
     private Map<Integer, GameConnection> handlers = new HashMap<>();
     private volatile boolean isRunning = false;
     private Scene scene;
+    private InputController inputController;
+    private PhysicalController physicalController;
 
     public GameServer(int port) {
         this.port = port;
@@ -39,7 +40,14 @@ public class GameServer implements ConnectionListener {
         isRunning = true;
         serverSocket = new ServerSocket(port);
         protocol = new SimpleProtocol();
-        scene = new Scene();
+        // 50 x 50 tiles
+        scene = new Scene(30, 20, 20);
+        inputController = new InputController();
+        inputController.setScene(scene);
+        physicalController = new PhysicalController();
+        physicalController.setScene(scene);
+        inputController.setPhysicalController(physicalController);
+
         logger.info("Waiting for a client...");
         while (isRunning) {
             Socket socket = serverSocket.accept();
@@ -97,18 +105,10 @@ public class GameServer implements ConnectionListener {
                     }
                     break;
                 case Message.MESSAGE_CMD_MOVE:
-                    MoveCommandMessage moveCmdMessage = (MoveCommandMessage) message;
-                    Unit unit = scene.getUnit(senderId);
-                    if (unit == null) {
-                        logger.warn("Unknown unit: " + senderId);
-                        return;
+                    Message response = inputController.hadleInput(message);
+                    if (response != null) {
+                        broadcast(response);
                     }
-                    if (unit.execute(moveCmdMessage.getCommand())) {
-                        DeltaMessage delta = new DeltaMessage();
-                        delta.addUnit(unit);
-                        broadcast(delta);
-                    }
-                    break;
             }
         } catch (IOException e) {
             e.printStackTrace();

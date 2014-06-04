@@ -77,18 +77,7 @@ class TiledScene {
 
 }
 
-class Tile {
-    int tileSize;
-    int x, y;
-    boolean isBlocked;
 
-    public Tile(int tileSize, int x, int y, boolean isBlocked) {
-        this.tileSize = tileSize;
-        this.x = x;
-        this.y = y;
-        this.isBlocked = isBlocked;
-    }
-}
 
 
 class Test extends JFrame {
