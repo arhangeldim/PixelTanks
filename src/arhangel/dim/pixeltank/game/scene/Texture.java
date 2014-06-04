@@ -1,4 +1,4 @@
-package arhangel.dim.pixeltank.game;
+package arhangel.dim.pixeltank.game.scene;
 
 import java.awt.*;
 

@@ -1,7 +1,9 @@
-package arhangel.dim.pixeltank;
+package arhangel.dim.pixeltank.gui;
 
+import arhangel.dim.pixeltank.connection.ClientConnection;
+import arhangel.dim.pixeltank.connection.ConnectionListener;
 import arhangel.dim.pixeltank.game.Direction;
-import arhangel.dim.pixeltank.game.Scene;
+import arhangel.dim.pixeltank.game.scene.Scene;
 import arhangel.dim.pixeltank.game.Unit;
 import arhangel.dim.pixeltank.messages.AckMessage;
 import arhangel.dim.pixeltank.messages.DeltaMessage;

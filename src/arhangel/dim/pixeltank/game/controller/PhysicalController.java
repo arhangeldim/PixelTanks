@@ -2,9 +2,9 @@ package arhangel.dim.pixeltank.game.controller;
 
 import arhangel.dim.pixeltank.game.Direction;
 import arhangel.dim.pixeltank.game.GameObject;
-import arhangel.dim.pixeltank.game.Position;
-import arhangel.dim.pixeltank.game.Scene;
-import arhangel.dim.pixeltank.game.Tile;
+import arhangel.dim.pixeltank.game.scene.Position;
+import arhangel.dim.pixeltank.game.scene.Scene;
+import arhangel.dim.pixeltank.game.scene.Tile;
 import arhangel.dim.pixeltank.game.Unit;
 import arhangel.dim.pixeltank.messages.DeltaMessage;
 import arhangel.dim.pixeltank.messages.Message;

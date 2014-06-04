@@ -1,8 +1,7 @@
 package arhangel.dim.pixeltank.game.controller;
 
 import arhangel.dim.pixeltank.game.GameObject;
-import arhangel.dim.pixeltank.game.Position;
-import arhangel.dim.pixeltank.game.Scene;
+import arhangel.dim.pixeltank.game.scene.Scene;
 import arhangel.dim.pixeltank.messages.Message;
 import arhangel.dim.pixeltank.messages.MoveCommandMessage;
 import org.slf4j.Logger;
@@ -43,11 +42,7 @@ public class InputController {
                     logger.warn("Unknown unit: " + senderId);
                     return null;
                 }
-                Position pos = unit.getPosition();
-                // set direction and a new position
                 unit.setDirection(moveCmdMessage.getDirection());
-
-
                 return physicalController.handle(unit);
             default:
 

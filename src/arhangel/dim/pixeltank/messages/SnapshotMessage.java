@@ -1,6 +1,6 @@
 package arhangel.dim.pixeltank.messages;
 
-import arhangel.dim.pixeltank.game.Scene;
+import arhangel.dim.pixeltank.game.scene.Scene;
 import arhangel.dim.pixeltank.game.Unit;
 
 import java.nio.ByteBuffer;

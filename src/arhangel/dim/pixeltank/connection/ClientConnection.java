@@ -1,4 +1,4 @@
-package arhangel.dim.pixeltank;
+package arhangel.dim.pixeltank.connection;
 
 import arhangel.dim.pixeltank.messages.LogonMessage;
 import arhangel.dim.pixeltank.messages.Message;

@@ -1,12 +1,11 @@
-package arhangel.dim.pixeltank;
+package arhangel.dim.pixeltank.connection;
 
-import arhangel.dim.pixeltank.game.Scene;
+import arhangel.dim.pixeltank.game.scene.Scene;
 import arhangel.dim.pixeltank.game.controller.InputController;
 import arhangel.dim.pixeltank.game.controller.PhysicalController;
 import arhangel.dim.pixeltank.messages.AckMessage;
 import arhangel.dim.pixeltank.messages.Message;
 import arhangel.dim.pixeltank.messages.SnapshotMessage;
-import arhangel.dim.pixeltank.protocol.ClientConnectionHandler;
 import arhangel.dim.pixeltank.protocol.Protocol;
 import arhangel.dim.pixeltank.protocol.SimpleProtocol;
 import org.slf4j.Logger;

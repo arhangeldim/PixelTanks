@@ -1,5 +1,6 @@
-package arhangel.dim.pixeltank.game;
+package arhangel.dim.pixeltank.game.scene;
 
+import arhangel.dim.pixeltank.game.Unit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

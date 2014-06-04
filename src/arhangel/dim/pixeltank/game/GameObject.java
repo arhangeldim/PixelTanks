@@ -1,5 +1,7 @@
 package arhangel.dim.pixeltank.game;
 
+import arhangel.dim.pixeltank.game.scene.Position;
+
 /**
  *
  */
