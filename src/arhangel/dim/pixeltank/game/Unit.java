@@ -9,6 +9,7 @@ public class Unit implements GameObject {
     private Direction direction;
     private Position position;
     private int velocity;
+    private GameObjectType type;
 
     public Unit() {
     }
@@ -60,6 +61,16 @@ public class Unit implements GameObject {
         return velocity;
     }
 
+
+    @Override
+    public GameObjectType getType() {
+        return type;
+    }
+
+    @Override
+    public void setType(GameObjectType type) {
+        this.type = type;
+    }
 
     public int getId() {
         return id;

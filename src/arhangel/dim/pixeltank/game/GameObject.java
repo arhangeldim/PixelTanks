@@ -6,6 +6,10 @@ import arhangel.dim.pixeltank.game.scene.Position;
  *
  */
 public interface GameObject {
+    public GameObjectType getType();
+
+    public void setType(GameObjectType type);
+
     public int getId();
 
     public void setId(int id);

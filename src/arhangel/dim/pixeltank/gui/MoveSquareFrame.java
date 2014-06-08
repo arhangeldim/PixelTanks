@@ -7,6 +7,7 @@ import arhangel.dim.pixeltank.game.scene.Scene;
 import arhangel.dim.pixeltank.game.Unit;
 import arhangel.dim.pixeltank.messages.AckMessage;
 import arhangel.dim.pixeltank.messages.DeltaMessage;
+import arhangel.dim.pixeltank.messages.FireMessage;
 import arhangel.dim.pixeltank.messages.LogonMessage;
 import arhangel.dim.pixeltank.messages.Message;
 import arhangel.dim.pixeltank.messages.MoveCommandMessage;
@@ -26,12 +27,6 @@ public class MoveSquareFrame extends JFrame implements ConnectionListener {
     Logger logger = LoggerFactory.getLogger(MoveSquareFrame.class);
     public static final int CANVAS_WIDTH = 600;
     public static final int CANVAS_HEIGHT = 500;
-    public static final Color LINE_COLOR = Color.BLACK;
-    public static final Color CANVAS_BACKGROUND = Color.WHITE;
-    private int x1 = CANVAS_WIDTH / 2;
-    private int y1 = CANVAS_HEIGHT / 2;
-    private int width = 20;
-    private int height = 20;
     private Scene scene;
     private DrawCanvas canvas;
     private ClientConnection clientConnection;
@@ -62,7 +57,6 @@ public class MoveSquareFrame extends JFrame implements ConnectionListener {
         clientConnection.start();// "this" JFrame fires KeyEvent
         addKeyListener(new KeyAdapter() {
             @Override
-
             public void keyPressed(KeyEvent evt) {
                 try {
                     switch (evt.getKeyCode()) {
@@ -81,6 +75,10 @@ public class MoveSquareFrame extends JFrame implements ConnectionListener {
                         case KeyEvent.VK_UP:
                             m = new MoveCommandMessage(Direction.UP);
                             clientConnection.send(m);//y1 -= 10;repaint();
+                            break;
+                        case KeyEvent.VK_SPACE:
+                            m = new FireMessage();
+                            clientConnection.send(m);
                             break;
                     }
                 } catch (Exception e) {

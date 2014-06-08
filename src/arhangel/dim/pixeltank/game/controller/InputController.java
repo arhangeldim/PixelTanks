@@ -1,11 +1,18 @@
 package arhangel.dim.pixeltank.game.controller;
 
+import arhangel.dim.pixeltank.connection.GameServer;
 import arhangel.dim.pixeltank.game.GameObject;
+import arhangel.dim.pixeltank.game.GameObjectType;
+import arhangel.dim.pixeltank.game.Unit;
+import arhangel.dim.pixeltank.game.scene.Position;
 import arhangel.dim.pixeltank.game.scene.Scene;
 import arhangel.dim.pixeltank.messages.Message;
 import arhangel.dim.pixeltank.messages.MoveCommandMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
@@ -13,7 +20,9 @@ import org.slf4j.LoggerFactory;
 public class InputController {
     private static Logger logger = LoggerFactory.getLogger(InputController.class);
     private Scene scene;
+    private GameServer server;
     private PhysicalController physicalController;
+    private AtomicInteger idCounter = new AtomicInteger(-1);
 
     public Scene getScene() {
         return scene;
@@ -31,6 +40,14 @@ public class InputController {
         this.physicalController = physicalController;
     }
 
+    public GameServer getServer() {
+        return server;
+    }
+
+    public void setServer(GameServer server) {
+        this.server = server;
+    }
+
     public Message hadleInput(Message message) {
         int senderId = message.getSenderId();
         int type = message.getType();
@@ -44,11 +61,66 @@ public class InputController {
                 }
                 unit.setDirection(moveCmdMessage.getDirection());
                 return physicalController.handle(unit);
+            case Message.MESSAGE_FIRE:
+                Unit owner = scene.getUnit(senderId);
+                logger.info("Fire on dir: {}", owner.getDirection());
+                GameObject bullet = new Unit();
+                bullet.setType(GameObjectType.ROCKET);
+                bullet.setPosition(new Position(owner.getPosition().x, owner.getPosition().y));
+                bullet.setDirection(owner.getDirection());
+                bullet.setVelocity(10);
+                bullet.setSize(5);
+                bullet.setId(idCounter.getAndDecrement());
+                scene.addUnit((Unit) bullet);
+                new Thread(new BulletTrace(bullet)).start();
+
             default:
 
 
         }
         return null;
+    }
+
+
+    class BulletTrace implements Runnable {
+
+        private GameObject bullet;
+
+        public BulletTrace(GameObject bullet) {
+            this.bullet = bullet;
+        }
+
+        @Override
+        public void run() {
+            Position pos = bullet.getPosition();
+            int v = bullet.getVelocity();
+            for (int i = 0; i < 100; i++) {
+                try {
+                    switch (bullet.getDirection()) {
+                        case RIGHT:
+                            pos.x += v;
+                            break;
+                        case LEFT:
+                            pos.x -= v;
+                            break;
+                        case UP:
+                            pos.y -= v;
+                            break;
+                        case DOWN:
+                            pos.y += v;
+                            break;
+                    }
+                    logger.info("Handle bullet: {}", bullet);
+                    server.broadcast(physicalController.handle(bullet));
+
+
+                    Thread.currentThread().sleep(500);
+
+                } catch (InterruptedException | IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 }

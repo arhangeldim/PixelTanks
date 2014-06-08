@@ -43,6 +43,7 @@ public class GameServer implements ConnectionListener {
         scene = new Scene(30, 20, 20);
         inputController = new InputController();
         inputController.setScene(scene);
+        inputController.setServer(this);
         physicalController = new PhysicalController();
         physicalController.setScene(scene);
         inputController.setPhysicalController(physicalController);
@@ -104,10 +105,12 @@ public class GameServer implements ConnectionListener {
                     }
                     break;
                 case Message.MESSAGE_CMD_MOVE:
+                case Message.MESSAGE_FIRE:
                     Message response = inputController.hadleInput(message);
                     if (response != null) {
                         broadcast(response);
                     }
+                    break;
             }
         } catch (IOException e) {
             e.printStackTrace();

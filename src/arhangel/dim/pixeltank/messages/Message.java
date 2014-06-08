@@ -9,6 +9,8 @@ public abstract class Message {
     public static final byte MESSAGE_CMD_MOVE = 2;
     public static final byte MESSAGE_SNAPSHOT = 3;
     public static final byte MESSAGE_DELTA = 4;
+    public static final byte MESSAGE_FIRE = 5;
+
     private int senderId;
     protected byte type;
 
