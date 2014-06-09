@@ -83,6 +83,8 @@ public class GameServer implements ConnectionListener {
     }
 
     public void broadcast(Message message) throws IOException {
+        if (message == null)
+            throw new RuntimeException("Invalid message");
         for (Map.Entry<Integer, GameConnection> entry : handlers.entrySet()) {
             entry.getValue().send(message);
         }

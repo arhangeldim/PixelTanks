@@ -117,6 +117,10 @@ public class Scene {
         units.put(clientId, unit);
     }
 
+    public void removeUnit(int clientId) {
+        units.remove(clientId);
+    }
+
 
     public Collection<Unit> getAllUnits() {
         return units.values();

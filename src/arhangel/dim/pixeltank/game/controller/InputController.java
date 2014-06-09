@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -64,13 +65,7 @@ public class InputController {
             case Message.MESSAGE_FIRE:
                 Unit owner = scene.getUnit(senderId);
                 logger.info("Fire on dir: {}", owner.getDirection());
-                GameObject bullet = new Unit();
-                bullet.setType(GameObjectType.ROCKET);
-                bullet.setPosition(new Position(owner.getPosition().x, owner.getPosition().y));
-                bullet.setDirection(owner.getDirection());
-                bullet.setVelocity(10);
-                bullet.setSize(5);
-                bullet.setId(idCounter.getAndDecrement());
+                GameObject bullet = createBullet(owner);
                 scene.addUnit((Unit) bullet);
                 new Thread(new BulletTrace(bullet)).start();
 
@@ -79,6 +74,17 @@ public class InputController {
 
         }
         return null;
+    }
+
+    private GameObject createBullet(Unit owner) {
+        GameObject bullet = new Unit();
+        bullet.setType(GameObjectType.ROCKET);
+        bullet.setPosition(new Position(owner.getPosition().x, owner.getPosition().y));
+        bullet.setDirection(owner.getDirection());
+        bullet.setVelocity(10);
+        bullet.setSize(5);
+        bullet.setId(idCounter.getAndDecrement());
+        return bullet;
     }
 
 
@@ -90,11 +96,16 @@ public class InputController {
             this.bullet = bullet;
         }
 
+        private void removeBullet() {
+            logger.info("Remove bullet from scene: {}", bullet);
+            scene.removeUnit(bullet.getId());
+        }
+
         @Override
         public void run() {
             Position pos = bullet.getPosition();
             int v = bullet.getVelocity();
-            for (int i = 0; i < 100; i++) {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
                     switch (bullet.getDirection()) {
                         case RIGHT:
@@ -111,13 +122,19 @@ public class InputController {
                             break;
                     }
                     logger.info("Handle bullet: {}", bullet);
-                    server.broadcast(physicalController.handle(bullet));
+                    Message msg = physicalController.handle(bullet);
+                    if (msg != null) {
+                        server.broadcast(msg);
+                    } else {
+                        logger.info("No delta message. ");
+                        removeBullet();
+                        return;
+                    }
 
-
-                    Thread.currentThread().sleep(500);
-
+                    TimeUnit.MILLISECONDS.sleep(500);
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
+                    Thread.currentThread().interrupt();
                 }
             }
         }
