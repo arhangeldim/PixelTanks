@@ -1,5 +1,6 @@
 package arhangel.dim.pixeltank.messages;
 
+import arhangel.dim.pixeltank.game.GameObject;
 import arhangel.dim.pixeltank.game.scene.Scene;
 import arhangel.dim.pixeltank.game.Unit;
 
@@ -49,8 +50,8 @@ public class SnapshotMessage extends Message {
         buffer.put((byte) scene.getTiledHeight());
         buffer.put((byte) scene.getTileSize());
         buffer.putInt(scene.getAllUnits().size());
-        for (Unit u : scene.getAllUnits()) {
-            buffer.putInt(u.pack());
+        for (GameObject ob : scene.getAllUnits()) {
+            buffer.putInt(ob.pack());
         }
     }
 

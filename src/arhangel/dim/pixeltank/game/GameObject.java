@@ -30,4 +30,6 @@ public interface GameObject {
 
     public int getVelocity();
 
+    public int pack();
+
 }

@@ -1,5 +1,7 @@
 package arhangel.dim.pixeltank.game.scene;
 
+import arhangel.dim.pixeltank.game.GameObject;
+import arhangel.dim.pixeltank.game.GameObjectType;
 import arhangel.dim.pixeltank.game.Unit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,7 @@ public class Scene {
     private Tile[][] tiles;
 
     private static final int UNIT_SIZE = 20;
+    private Map<Integer, GameObject> gameObjectMap = new HashMap<>();
 
     public Scene(int tiledWidth, int tiledHeight, int tileSize) {
         this.width = tileSize * tiledWidth;
@@ -29,7 +32,6 @@ public class Scene {
         tiles = new Tile[tiledWidth][tiledHeight];
         generateScene();
     }
-
 
     public int getTileSize() {
         return tileSize;
@@ -64,11 +66,6 @@ public class Scene {
         return tile;
     }
 
-
-    private Map<Integer, Unit> units = new HashMap<>();
-    Terrain groundTerrain = new Terrain(1, false, new Texture(Color.GRAY));
-
-
     public int getWidth() {
         return width;
     }
@@ -101,44 +98,40 @@ public class Scene {
 
     public Unit generateUnit(int clientId) {
         Unit unit = new Unit(clientId, new Position(100, 100), 5, UNIT_SIZE);
-        units.put(clientId, unit);
+        gameObjectMap.put(clientId, unit);
         return unit;
     }
 
     public boolean updateUnit(int id, Unit unit) {
-        if (units.containsKey(id)) {
-            units.put(id, unit);
+        if (gameObjectMap.containsKey(id)) {
+            gameObjectMap.put(id, unit);
             return true;
         }
         return false;
     }
 
     public void addUnit(int clientId, Unit unit) {
-        units.put(clientId, unit);
+        gameObjectMap.put(clientId, unit);
     }
 
     public void removeUnit(int clientId) {
-        units.remove(clientId);
+        gameObjectMap.remove(clientId);
     }
 
 
-    public Collection<Unit> getAllUnits() {
-        return units.values();
+    public Collection<GameObject> getAllUnits() {
+        return gameObjectMap.values();
     }
 
     public void addUnit(Unit unit) {
         logger.info("Added new unit {}", unit);
-        units.put(unit.getId(), unit);
+        gameObjectMap.put(unit.getId(), unit);
     }
 
-    public Unit getUnit(int id) {
-        Unit unit = units.get(id);
-        logger.info("Get unit by id: {}, {}", id, unit);
-        return unit;
-    }
-
-    public boolean isValidPosition(int x, int y) {
-        return (x >= 0 && x <= width && y >= 0 && y <= height);
+    public GameObject getGameObject(int id) {
+        GameObject gameObject = gameObjectMap.get(id);
+        logger.info("Get object by id: {}, {}", id, gameObject);
+        return gameObject;
     }
 
     @Override
@@ -149,7 +142,7 @@ public class Scene {
                 ", tileSize=" + tileSize +
                 ", tiledWidth=" + tiledWidth +
                 ", tiledHeight=" + tiledHeight +
-                ", units=" + units +
+                ", gameObjectMap=" + gameObjectMap +
                 '}';
     }
 
@@ -168,12 +161,15 @@ public class Scene {
             }
         }
 
-
         //component.setBackground(groundTerrain.getTexture().getColor());
-        for (Map.Entry<Integer, Unit> entry : units.entrySet()) {
-            Unit unit = entry.getValue();
-            g.setColor(Color.BLUE);
-            Position pos = unit.getPosition();
+        for (Map.Entry<Integer, GameObject> entry : gameObjectMap.entrySet()) {
+            GameObject gameObject = entry.getValue();
+            if (gameObject.getType() == GameObjectType.UNIT) {
+                g.setColor(Color.BLUE);
+            } else {
+                g.setColor(Color.MAGENTA);
+            }
+            Position pos = gameObject.getPosition();
             g.fillRect(pos.x, pos.y, UNIT_SIZE, UNIT_SIZE);
         }
     }

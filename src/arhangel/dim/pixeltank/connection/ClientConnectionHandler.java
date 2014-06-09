@@ -16,7 +16,7 @@ import java.util.List;
 public class ClientConnectionHandler implements GameConnection {
     private static Logger logger = LoggerFactory.getLogger(ClientConnectionHandler.class);
     private Socket socket;
-    private int clientlId;
+    private int clientId;
     private GameServer server;
     private Thread worker;
     private DataInputStream in;
@@ -27,7 +27,7 @@ public class ClientConnectionHandler implements GameConnection {
         logger.info("Creating handler for client: {}", clientId);
         this.server = server;
         this.socket = socket;
-        this.clientlId = clientId;
+        this.clientId = clientId;
         in = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());
         listeners = new ArrayList<>();
@@ -38,7 +38,7 @@ public class ClientConnectionHandler implements GameConnection {
                     while (!Thread.currentThread().isInterrupted()) {
                         try {
                             Message message = server.getProtocol().decode(in);
-                            message.setSenderId(clientlId);
+                            message.setSenderId(ClientConnectionHandler.this.clientId);
                             for (ConnectionListener listener : listeners) {
                                 listener.onMessageReceived(message);
                             }
@@ -49,7 +49,7 @@ public class ClientConnectionHandler implements GameConnection {
                 } catch (IOException e) {
                     logger.error("Failed to read from socket.");
                 } finally {
-                    server.removeHandler(clientlId);
+                    server.removeHandler(ClientConnectionHandler.this.clientId);
 //                    interrupt();
                 }
             }
@@ -64,7 +64,7 @@ public class ClientConnectionHandler implements GameConnection {
         } catch (IOException e) {
             System.out.println("Failed to write to socket. " + this);
             closeResources();
-            server.removeHandler(clientlId);//interrupt();
+            server.removeHandler(clientId);//interrupt();
         }
     }
 
@@ -98,6 +98,6 @@ public class ClientConnectionHandler implements GameConnection {
     }
 
     public String toString() {
-        return "Handler [id= " + clientlId + "];";
+        return "Handler [id= " + clientId + "];";
     }
 }

@@ -35,7 +35,7 @@ public class PhysicalController {
 
         deltas = new ArrayList<>();
         detectCollision(object);
-        logger.info("Collision: " + deltas);
+        logger.info("Deltas: " + deltas);
         if (deltas.isEmpty()) {
             return null;
         }

@@ -1,9 +1,13 @@
 package arhangel.dim.pixeltank.game;
 
 import arhangel.dim.pixeltank.game.scene.Position;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /****/
 public class Unit implements GameObject {
+    private static final Logger logger = LoggerFactory.getLogger(Unit.class);
+
     private int id;
     private int size;
     private Direction direction;
@@ -85,11 +89,17 @@ public class Unit implements GameObject {
             return -1;
         }
         int packed = 0;
-        packed |= id & 0xfff;
+
+        // TODO: collision with id possible because of sign reducing
+        packed |= (id & 0x7ff) << 1;
+
+        packed |= (type == GameObjectType.ROCKET) ? 0x1 : 0x0;
+
         packed |= ((int) position.x) << 12;
         packed |= ((int) position.y) << 22;
         return packed;
     }
+
 
     private boolean validate() {
         return (id < 0x1000) && (position.x < 0x400) && (position.y < 0x400);
@@ -97,9 +107,9 @@ public class Unit implements GameObject {
 
     public void unpack(long packed) {
         if (packed >= 0) {
-
-            id = (short) (packed & 0xfff);
-            int x = (int)((packed >> 12) & 0x3ff);
+            type = ((packed & 0x1) == 0x1) ? GameObjectType.ROCKET : GameObjectType.UNIT;
+            id = (short) ((packed >> 1) & 0x7ff);
+            int x = (int) ((packed >> 12) & 0x3ff);
             int y = (int) ((packed >> 22) & 0x3ff);
             position = new Position(x, y);
         }

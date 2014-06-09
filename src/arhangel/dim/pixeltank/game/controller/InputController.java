@@ -55,7 +55,7 @@ public class InputController {
         switch (type) {
             case Message.MESSAGE_CMD_MOVE:
                 MoveCommandMessage moveCmdMessage = (MoveCommandMessage) message;
-                GameObject unit = scene.getUnit(senderId);
+                GameObject unit = scene.getGameObject(senderId);
                 if (unit == null) {
                     logger.warn("Unknown unit: " + senderId);
                     return null;
@@ -63,7 +63,7 @@ public class InputController {
                 unit.setDirection(moveCmdMessage.getDirection());
                 return physicalController.handle(unit);
             case Message.MESSAGE_FIRE:
-                Unit owner = scene.getUnit(senderId);
+                GameObject owner = scene.getGameObject(senderId);
                 logger.info("Fire on dir: {}", owner.getDirection());
                 GameObject bullet = createBullet(owner);
                 scene.addUnit((Unit) bullet);
@@ -76,7 +76,7 @@ public class InputController {
         return null;
     }
 
-    private GameObject createBullet(Unit owner) {
+    private GameObject createBullet(GameObject owner) {
         GameObject bullet = new Unit();
         bullet.setType(GameObjectType.ROCKET);
         bullet.setPosition(new Position(owner.getPosition().x, owner.getPosition().y));
