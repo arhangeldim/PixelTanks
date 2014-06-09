@@ -6,11 +6,14 @@ import java.nio.ByteBuffer;
 public class LogonMessage extends Message {
     String login;
 
+    public LogonMessage() {
+    }
+
     public LogonMessage(String login) {
         this.login = login;
     }
 
-    public LogonMessage(ByteBuffer buffer) {
+    public void unpack(ByteBuffer buffer) {
         type = buffer.get();
         int length = buffer.getInt();
         char[] tmp = new char[length];

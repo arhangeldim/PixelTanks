@@ -8,11 +8,14 @@ import java.nio.ByteBuffer;
 public class MoveCommandMessage extends Message {
     private Direction direction;
 
+    public MoveCommandMessage() {
+    }
+
     public MoveCommandMessage(Direction cmd) {
         this.direction = cmd;
     }
 
-    public MoveCommandMessage(ByteBuffer packed) {
+    public void unpack(ByteBuffer packed) {
         type = packed.get();
         byte code = packed.get();
         direction = Direction.byCode(code);

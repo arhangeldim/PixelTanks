@@ -13,7 +13,7 @@ public class DeltaMessage extends Message {
     public DeltaMessage() {
     }
 
-    public DeltaMessage(ByteBuffer packed) {
+    public void unpack(ByteBuffer packed) {
         type = packed.get();
         int size = packed.getInt();
         for (int i = 0; i < size; i++) {

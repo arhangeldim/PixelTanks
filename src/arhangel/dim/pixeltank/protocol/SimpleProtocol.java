@@ -69,26 +69,27 @@ public class SimpleProtocol implements Protocol {
         int type = packet.get(0);
         switch (type) {
             case Message.MESSAGE_LOGON:
-                message = new LogonMessage(packet);
+                message = new LogonMessage();
                 break;
             case Message.MESSAGE_ACK:
-                message = new AckMessage(packet);
+                message = new AckMessage();
                 break;
             case Message.MESSAGE_CMD_MOVE:
-                message = new MoveCommandMessage(packet);
+                message = new MoveCommandMessage();
                 break;
             case Message.MESSAGE_DELTA:
-                message = new DeltaMessage(packet);
+                message = new DeltaMessage();
                 break;
             case Message.MESSAGE_SNAPSHOT:
-                message = new SnapshotMessage(packet);
+                message = new SnapshotMessage();
                 break;
             case Message.MESSAGE_FIRE:
-                message = new FireMessage(packet);
+                message = new FireMessage();
                 break;
             default:
                 throw new MessageDecodingException("Unknown message type: " + type);
         }
+        message.unpack(packet);
         logger.info("decode: {}, {}", header, message);
         return message;
     }

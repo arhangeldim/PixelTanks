@@ -9,11 +9,14 @@ import java.nio.ByteBuffer;
 public class SnapshotMessage extends Message {
     private Scene scene;
 
+    public SnapshotMessage() {
+    }
+
     public SnapshotMessage(Scene scene) {
         this.scene = scene;
     }
 
-    public SnapshotMessage(ByteBuffer packed) {
+    public void unpack(ByteBuffer packed) {
         type = packed.get();
         // tiled W, H, tile size
         scene = new Scene(packed.get(), packed.get(), packed.get());

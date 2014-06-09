@@ -29,4 +29,6 @@ public abstract class Message {
     public abstract int getSize();
 
     public abstract void packTo(ByteBuffer buffer, int pos);
+    
+    public abstract void unpack(ByteBuffer buffer);
 }

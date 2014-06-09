@@ -9,11 +9,14 @@ public class AckMessage extends Message {
 
     private byte status;
 
+    public AckMessage() {
+    }
+
     public AckMessage(byte status) {
         this.status = status;
     }
 
-    public AckMessage(ByteBuffer buffer) {
+    public void unpack(ByteBuffer buffer) {
         type = buffer.get();
         status = buffer.get();
     }

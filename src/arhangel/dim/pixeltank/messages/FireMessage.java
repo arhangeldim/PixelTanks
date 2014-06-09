@@ -8,10 +8,9 @@ import java.nio.ByteBuffer;
 public class FireMessage extends Message {
 
     public FireMessage() {
-
     }
 
-    public FireMessage(ByteBuffer buffer) {
+    public void unpack(ByteBuffer buffer) {
         type = buffer.get();
     }
 
