@@ -1,5 +1,7 @@
 package arhangel.dim.pixeltank.messages;
 
+import arhangel.dim.pixeltank.game.Player;
+
 import java.nio.ByteBuffer;
 
 /****/
@@ -12,6 +14,7 @@ public abstract class Message {
     public static final byte MESSAGE_FIRE = 5;
 
     private int senderId;
+    private Player player;
     protected byte type;
 
     public byte getType() {

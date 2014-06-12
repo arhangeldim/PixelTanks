@@ -89,20 +89,12 @@ public class Scene {
                 tiles[i][j] = new Tile(tileSize, i, j, false);
             }
         }
-
         for (int i = 3; i < 7; i++) {
             tiles[i][4].isBlocked = true;
-
         }
     }
 
-    public Unit generateUnit(int clientId) {
-        Unit unit = new Unit(clientId, new Position(100, 100), 5, UNIT_SIZE);
-        gameObjectMap.put(clientId, unit);
-        return unit;
-    }
-
-    public boolean updateUnit(int id, Unit unit) {
+    public boolean updateObject(int id, GameObject unit) {
         if (gameObjectMap.containsKey(id)) {
             gameObjectMap.put(id, unit);
             return true;
@@ -110,25 +102,19 @@ public class Scene {
         return false;
     }
 
-    public void addUnit(int clientId, Unit unit) {
+    public void addObject(int clientId, GameObject unit) {
         gameObjectMap.put(clientId, unit);
     }
 
-    public void removeUnit(int clientId) {
+    public void removeObject(int clientId) {
         gameObjectMap.remove(clientId);
     }
 
-
-    public Collection<GameObject> getAllUnits() {
+    public Collection<GameObject> getAllObjects() {
         return gameObjectMap.values();
     }
 
-    public void addUnit(Unit unit) {
-        logger.info("Added new unit {}", unit);
-        gameObjectMap.put(unit.getId(), unit);
-    }
-
-    public GameObject getGameObject(int id) {
+    public GameObject getObject(int id) {
         GameObject gameObject = gameObjectMap.get(id);
         logger.info("Get object by id: {}, {}", id, gameObject);
         return gameObject;

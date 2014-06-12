@@ -2,8 +2,7 @@ package arhangel.dim.pixeltank.game.controller;
 
 import arhangel.dim.pixeltank.connection.GameServer;
 import arhangel.dim.pixeltank.game.GameObject;
-import arhangel.dim.pixeltank.game.GameObjectType;
-import arhangel.dim.pixeltank.game.Unit;
+import arhangel.dim.pixeltank.game.RocketFactory;
 import arhangel.dim.pixeltank.game.scene.Position;
 import arhangel.dim.pixeltank.game.scene.Scene;
 import arhangel.dim.pixeltank.messages.Message;
@@ -24,6 +23,15 @@ public class InputController {
     private GameServer server;
     private PhysicalController physicalController;
     private AtomicInteger idCounter = new AtomicInteger(-1);
+    private RocketFactory rocketFactory;
+
+    public RocketFactory getRocketFactory() {
+        return rocketFactory;
+    }
+
+    public void setRocketFactory(RocketFactory rocketFactory) {
+        this.rocketFactory = rocketFactory;
+    }
 
     public Scene getScene() {
         return scene;
@@ -55,7 +63,7 @@ public class InputController {
         switch (type) {
             case Message.MESSAGE_CMD_MOVE:
                 MoveCommandMessage moveCmdMessage = (MoveCommandMessage) message;
-                GameObject unit = scene.getGameObject(senderId);
+                GameObject unit = scene.getObject(senderId);
                 if (unit == null) {
                     logger.warn("Unknown unit: " + senderId);
                     return null;
@@ -63,10 +71,10 @@ public class InputController {
                 unit.setDirection(moveCmdMessage.getDirection());
                 return physicalController.handle(unit);
             case Message.MESSAGE_FIRE:
-                GameObject owner = scene.getGameObject(senderId);
+                GameObject owner = scene.getObject(senderId);
                 logger.info("Fire on dir: {}", owner.getDirection());
-                GameObject bullet = createBullet(owner);
-                scene.addUnit((Unit) bullet);
+                GameObject bullet = rocketFactory.create(owner);
+                scene.addObject(bullet.getId(), bullet);
                 new Thread(new BulletTrace(bullet)).start();
 
             default:
@@ -75,18 +83,6 @@ public class InputController {
         }
         return null;
     }
-
-    private GameObject createBullet(GameObject owner) {
-        GameObject bullet = new Unit();
-        bullet.setType(GameObjectType.ROCKET);
-        bullet.setPosition(new Position(owner.getPosition().x, owner.getPosition().y));
-        bullet.setDirection(owner.getDirection());
-        bullet.setVelocity(10);
-        bullet.setSize(5);
-        bullet.setId(idCounter.getAndDecrement());
-        return bullet;
-    }
-
 
     class BulletTrace implements Runnable {
 
@@ -98,7 +94,7 @@ public class InputController {
 
         private void removeBullet() {
             logger.info("Remove bullet from scene: {}", bullet);
-            scene.removeUnit(bullet.getId());
+            scene.removeObject(bullet.getId());
         }
 
         @Override

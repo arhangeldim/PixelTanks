@@ -1,5 +1,9 @@
 package arhangel.dim.pixeltank.connection;
 
+import arhangel.dim.pixeltank.game.GameObjectFactory;
+import arhangel.dim.pixeltank.game.Player;
+import arhangel.dim.pixeltank.game.RocketFactory;
+import arhangel.dim.pixeltank.game.TankFactory;
 import arhangel.dim.pixeltank.game.scene.Scene;
 import arhangel.dim.pixeltank.game.controller.InputController;
 import arhangel.dim.pixeltank.game.controller.PhysicalController;
@@ -31,6 +35,11 @@ public class GameServer implements ConnectionListener {
     private InputController inputController;
     private PhysicalController physicalController;
 
+
+    private Map<Integer, Player> players = new HashMap<>();
+    private GameObjectFactory tankFactory;
+    private RocketFactory rocketFactory;
+
     public GameServer(int port) {
         this.port = port;
     }
@@ -41,11 +50,17 @@ public class GameServer implements ConnectionListener {
         protocol = new SimpleProtocol();
         // 50 x 50 tiles
         scene = new Scene(30, 20, 20);
+        tankFactory = TankFactory.getObjectFactory(scene);
+        rocketFactory = RocketFactory.getObjectFactory(scene);
+
         inputController = new InputController();
         inputController.setScene(scene);
         inputController.setServer(this);
+        inputController.setRocketFactory(rocketFactory);
+
         physicalController = new PhysicalController();
         physicalController.setScene(scene);
+
         inputController.setPhysicalController(physicalController);
 
         logger.info("Waiting for a client...");
@@ -95,11 +110,16 @@ public class GameServer implements ConnectionListener {
         try {
             int senderId = message.getSenderId();
             int type = message.getType();
+            Player player = players.get(senderId);
             GameConnection conn;
             switch (type) {
                 case Message.MESSAGE_LOGON:
+                    if (player == null) {
+                        player = new Player(senderId,"Test");
+                        players.put(senderId, player);
+                    }
                     conn = handlers.get(senderId);
-                    if (scene.generateUnit(senderId) != null) {
+                    if (tankFactory.create(player) != null) {
                         conn.send(new AckMessage(AckMessage.STATUS_SUCCESS));
                         conn.send(new SnapshotMessage(scene));
                     } else {

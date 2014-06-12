@@ -25,7 +25,7 @@ public class SnapshotMessage extends Message {
         for (int i = 0; i < size; i++) {
             Unit unit = new Unit();
             unit.unpack(packed.getInt());
-            scene.addUnit(unit);
+            scene.addObject(unit.getId(), unit);
         }
     }
 
@@ -39,7 +39,7 @@ public class SnapshotMessage extends Message {
 
     @Override
     public int getSize() {
-        return 1 + 4 + 3 +  4 * scene.getAllUnits().size();
+        return 1 + 4 + 3 +  4 * scene.getAllObjects().size();
     }
 
     @Override
@@ -49,8 +49,8 @@ public class SnapshotMessage extends Message {
         buffer.put((byte) scene.getTiledWidth());
         buffer.put((byte) scene.getTiledHeight());
         buffer.put((byte) scene.getTileSize());
-        buffer.putInt(scene.getAllUnits().size());
-        for (GameObject ob : scene.getAllUnits()) {
+        buffer.putInt(scene.getAllObjects().size());
+        for (GameObject ob : scene.getAllObjects()) {
             buffer.putInt(ob.pack());
         }
     }

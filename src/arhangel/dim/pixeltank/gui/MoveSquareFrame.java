@@ -3,8 +3,8 @@ package arhangel.dim.pixeltank.gui;
 import arhangel.dim.pixeltank.connection.ClientConnection;
 import arhangel.dim.pixeltank.connection.ConnectionListener;
 import arhangel.dim.pixeltank.game.Direction;
+import arhangel.dim.pixeltank.game.GameObject;
 import arhangel.dim.pixeltank.game.scene.Scene;
-import arhangel.dim.pixeltank.game.Unit;
 import arhangel.dim.pixeltank.messages.AckMessage;
 import arhangel.dim.pixeltank.messages.DeltaMessage;
 import arhangel.dim.pixeltank.messages.FireMessage;
@@ -123,12 +123,12 @@ public class MoveSquareFrame extends JFrame implements ConnectionListener {
                     return;
                 }
                 DeltaMessage deltaMessage = (DeltaMessage) message;
-                for (Unit unit : deltaMessage.getUnits()) {
+                for (GameObject object : deltaMessage.getDeltaObjects()) {
 
                     // TODO: have to generate new message(added new player) instead of adding
                     // broadcast logon info about new users
-                    if (!scene.updateUnit(unit.getId(), unit)) {
-                        scene.addUnit(unit.getId(), unit);
+                    if (!scene.updateObject(object.getId(), object)) {
+                        scene.addObject(object.getId(), object);
                     }
                 }
                 repaint();

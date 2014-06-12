@@ -1,5 +1,6 @@
 package arhangel.dim.pixeltank.messages;
 
+import arhangel.dim.pixeltank.game.GameObject;
 import arhangel.dim.pixeltank.game.Unit;
 
 import java.nio.ByteBuffer;
@@ -8,7 +9,7 @@ import java.util.Set;
 
 /****/
 public class DeltaMessage extends Message {
-    private Set<Unit> units = new HashSet<>();
+    private Set<GameObject> deltaObjects = new HashSet<>();
 
     public DeltaMessage() {
     }
@@ -19,21 +20,21 @@ public class DeltaMessage extends Message {
         for (int i = 0; i < size; i++) {
             Unit unit = new Unit();
             unit.unpack(packed.getInt());
-            units.add(unit);
+            deltaObjects.add(unit);
         }
     }
 
-    public Set<Unit> getUnits() {
-        return units;
+    public Set<GameObject> getDeltaObjects() {
+        return deltaObjects;
     }
 
     public void addUnit(Unit unit) {
-        units.add(unit);
+        deltaObjects.add(unit);
     }
 
     @Override
     public int getSize() {
-        int size = 1 + 4 + 4 * units.size();
+        int size = 1 + 4 + 4 * deltaObjects.size();
         return size;
     }
 
@@ -41,14 +42,14 @@ public class DeltaMessage extends Message {
     public void packTo(ByteBuffer buffer, int pos) {
         buffer.position(pos);
         buffer.put(MESSAGE_DELTA);
-        buffer.putInt(units.size());
-        for (Unit u : units) {
-            buffer.putInt(u.pack());
+        buffer.putInt(deltaObjects.size());
+        for (GameObject object : deltaObjects) {
+            buffer.putInt(object.pack());
         }
     }
 
     @Override
     public String toString() {
-        return "DeltaMessage{" + "units=" + units + '}';
+        return "DeltaMessage{" + "deltaObjects=" + deltaObjects + '}';
     }
 }

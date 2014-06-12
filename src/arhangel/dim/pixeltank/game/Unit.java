@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /****/
-public class Unit implements GameObject {
+public class Unit extends GameObject {
     private static final Logger logger = LoggerFactory.getLogger(Unit.class);
 
     private int id;
@@ -16,6 +16,10 @@ public class Unit implements GameObject {
     private GameObjectType type;
 
     public Unit() {
+    }
+
+    public Unit(Player player) {
+        this.player = player;
     }
 
     public Unit(int id, Position position, int velocity, int size) {

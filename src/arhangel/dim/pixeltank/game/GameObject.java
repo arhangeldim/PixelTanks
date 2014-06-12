@@ -5,31 +5,30 @@ import arhangel.dim.pixeltank.game.scene.Position;
 /**
  *
  */
-public interface GameObject {
-    public GameObjectType getType();
+public abstract class GameObject {
 
-    public void setType(GameObjectType type);
+    protected Player player;
 
-    public int getId();
+    public Player getPlayer() {
+        return player;
+    }
 
-    public void setId(int id);
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
 
-    public Position getPosition();
-
-    public void setPosition(Position position);
-
-    public int getSize();
-
-    public void setSize(int size);
-
-    public Direction getDirection();
-
-    public void setDirection(Direction dir);
-
-    public void setVelocity(int v);
-
-    public int getVelocity();
-
-    public int pack();
+    public abstract GameObjectType getType();
+    public abstract void setType(GameObjectType type);
+    public abstract int getId();
+    public abstract void setId(int id);
+    public abstract Position getPosition();
+    public abstract void setPosition(Position position);
+    public abstract int getSize();
+    public abstract void setSize(int size);
+    public abstract Direction getDirection();
+    public abstract void setDirection(Direction dir);
+    public abstract void setVelocity(int v);
+    public abstract int getVelocity();
+    public abstract int pack();
 
 }
