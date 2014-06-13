@@ -13,6 +13,14 @@ public class LogonMessage extends Message {
         this.login = login;
     }
 
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
     public void unpack(ByteBuffer buffer) {
         type = buffer.get();
         int length = buffer.getInt();

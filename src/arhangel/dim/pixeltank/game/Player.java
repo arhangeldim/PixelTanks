@@ -43,4 +43,12 @@ public class Player {
         Player other = (Player) obj;
         return other.id == this.id;
     }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

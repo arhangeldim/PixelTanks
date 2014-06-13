@@ -9,6 +9,7 @@ import arhangel.dim.pixeltank.game.TankFactory;
 import arhangel.dim.pixeltank.game.scene.Position;
 import arhangel.dim.pixeltank.game.scene.Scene;
 import arhangel.dim.pixeltank.messages.AckMessage;
+import arhangel.dim.pixeltank.messages.LogonMessage;
 import arhangel.dim.pixeltank.messages.Message;
 import arhangel.dim.pixeltank.messages.MoveCommandMessage;
 import arhangel.dim.pixeltank.messages.SnapshotMessage;
@@ -17,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
@@ -70,10 +70,13 @@ public class InputController implements ConnectionListener {
                         throw new RuntimeException("Unexpected value");
                     }
                     if (tankFactory.create(player) != null) {
+                        player.setName(((LogonMessage) message).getLogin());
                         server.sendTo(player, new AckMessage(AckMessage.STATUS_SUCCESS));
                         server.sendTo(player, new SnapshotMessage(scene));
+                        logger.info("{} logged on", player);
                     } else {
                         server.sendTo(player, new AckMessage(AckMessage.STATUS_FAILED));
+                        logger.warn("Failed to log on {}", player);
                     }
                     break;
                 case Message.MESSAGE_CMD_MOVE:

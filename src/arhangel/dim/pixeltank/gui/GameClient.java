@@ -23,8 +23,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 /****/
-public class MoveSquareFrame extends JFrame implements ConnectionListener {
-    Logger logger = LoggerFactory.getLogger(MoveSquareFrame.class);
+public class GameClient extends JFrame implements ConnectionListener {
+    Logger logger = LoggerFactory.getLogger(GameClient.class);
     public static final int CANVAS_WIDTH = 600;
     public static final int CANVAS_HEIGHT = 500;
     private Scene scene;
@@ -32,7 +32,7 @@ public class MoveSquareFrame extends JFrame implements ConnectionListener {
     private ClientConnection clientConnection;
     private volatile boolean isLogged = false;
 
-    public MoveSquareFrame() throws Exception {
+    public GameClient() throws Exception {
         JPanel btnPanel = new JPanel(new FlowLayout());
         JButton btnLeft = new JButton("Login");
         btnPanel.add(btnLeft);
@@ -112,8 +112,6 @@ public class MoveSquareFrame extends JFrame implements ConnectionListener {
                 }
                 SnapshotMessage snapshotMessage = (SnapshotMessage) message;
                 scene = snapshotMessage.getScene();
-                System.out.println(canvas);
-                System.out.println(scene);
                 canvas.setPreferredSize(new Dimension(scene.getWidth(), scene.getHeight()));
                 repaint();
                 break;
@@ -152,7 +150,7 @@ public class MoveSquareFrame extends JFrame implements ConnectionListener {
             @Override
             public void run() {
                 try {
-                    new MoveSquareFrame(); // Let the constructor do the job
+                    new GameClient(); // Let the constructor do the job
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
