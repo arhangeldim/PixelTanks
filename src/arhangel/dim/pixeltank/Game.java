@@ -3,8 +3,10 @@ package arhangel.dim.pixeltank;
 import arhangel.dim.pixeltank.connection.GameServer;
 import arhangel.dim.pixeltank.game.RocketFactory;
 import arhangel.dim.pixeltank.game.TankFactory;
+import arhangel.dim.pixeltank.game.controller.GameEventHandler;
+import arhangel.dim.pixeltank.game.controller.GameEventListener;
 import arhangel.dim.pixeltank.game.controller.InputController;
-import arhangel.dim.pixeltank.game.controller.PhysicalController;
+import arhangel.dim.pixeltank.game.controller.OutputController;
 import arhangel.dim.pixeltank.game.scene.Scene;
 import arhangel.dim.pixeltank.protocol.SimpleProtocol;
 import org.slf4j.Logger;
@@ -28,19 +30,21 @@ public class Game {
         TankFactory tankFactory = (TankFactory) TankFactory.getObjectFactory(scene);
         RocketFactory rocketFactory = RocketFactory.getObjectFactory(scene);
 
+        OutputController output = new OutputController();
+        output.setServer(server);
+        output.setScene(scene);
+
+        GameEventHandler gameEventHandler = new GameEventHandler();
+        gameEventHandler.setScene(scene);
+        gameEventHandler.setRocketFactory(rocketFactory);
+        gameEventHandler.setTankFactory(tankFactory);
+        gameEventHandler.addGameEventListener(output);
+
         InputController inputController = new InputController();
-        inputController.setServer(server);
-        inputController.setScene(scene);
-        inputController.setRocketFactory(rocketFactory);
-        inputController.setTankFactory(tankFactory);
+        inputController.setHandler(gameEventHandler);
 
         server.setClientListener(inputController);
         server.setProtocol(new SimpleProtocol());
-
-        PhysicalController physicalController = new PhysicalController();
-        physicalController.setScene(scene);
-
-        inputController.setPhysicalController(physicalController);
 
     }
 
