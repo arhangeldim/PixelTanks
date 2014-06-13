@@ -9,8 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  */
 public class TankFactory implements GameObjectFactory {
-
-    private static AtomicInteger idGenerator = new AtomicInteger(0);
     private Scene scene;
     private static volatile TankFactory instance;
 
@@ -33,6 +31,7 @@ public class TankFactory implements GameObjectFactory {
         tank.setVelocity(5);
         tank.setSize(10);
         tank.setDirection(Direction.LEFT);
+        tank.setId(player.getId());
 
         scene.addObject(player.getId(), tank);
         return tank;

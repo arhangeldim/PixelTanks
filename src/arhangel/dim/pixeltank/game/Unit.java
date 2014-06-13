@@ -69,7 +69,6 @@ public class Unit extends GameObject {
         return velocity;
     }
 
-
     @Override
     public GameObjectType getType() {
         return type;
@@ -96,11 +95,9 @@ public class Unit extends GameObject {
 
         // TODO: collision with id possible because of sign reducing
         packed |= (id & 0x7ff) << 1;
-
         packed |= (type == GameObjectType.ROCKET) ? 0x1 : 0x0;
-
-        packed |= ((int) position.x) << 12;
-        packed |= ((int) position.y) << 22;
+        packed |= (position.x) << 12;
+        packed |= (position.y) << 22;
         return packed;
     }
 

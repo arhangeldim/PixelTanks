@@ -1,5 +1,6 @@
 package arhangel.dim.pixeltank.connection;
 
+import arhangel.dim.pixeltank.game.Player;
 import arhangel.dim.pixeltank.messages.Message;
 import arhangel.dim.pixeltank.protocol.MessageDecodingException;
 import org.slf4j.Logger;
@@ -16,18 +17,18 @@ import java.util.List;
 public class ClientConnectionHandler implements GameConnection {
     private static Logger logger = LoggerFactory.getLogger(ClientConnectionHandler.class);
     private Socket socket;
-    private int clientId;
+    private Player player;
     private GameServer server;
     private Thread worker;
     private DataInputStream in;
     private DataOutputStream out;
     private List<ConnectionListener> listeners;
 
-    public ClientConnectionHandler(final GameServer server, Socket socket, int clientId) throws IOException {
-        logger.info("Creating handler for client: {}", clientId);
+    public ClientConnectionHandler(final GameServer server, Socket socket, final Player player) throws IOException {
+        logger.info("Creating handler for client: {}", player);
         this.server = server;
         this.socket = socket;
-        this.clientId = clientId;
+        this.player = player;
         in = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());
         listeners = new ArrayList<>();
@@ -38,7 +39,7 @@ public class ClientConnectionHandler implements GameConnection {
                     while (!Thread.currentThread().isInterrupted()) {
                         try {
                             Message message = server.getProtocol().decode(in);
-                            message.setSenderId(ClientConnectionHandler.this.clientId);
+                            message.setPlayer(player);
                             for (ConnectionListener listener : listeners) {
                                 listener.onMessageReceived(message);
                             }
@@ -49,7 +50,7 @@ public class ClientConnectionHandler implements GameConnection {
                 } catch (IOException e) {
                     logger.error("Failed to read from socket.");
                 } finally {
-                    server.removeHandler(ClientConnectionHandler.this.clientId);
+                    server.removeHandler(player);
 //                    interrupt();
                 }
             }
@@ -64,7 +65,7 @@ public class ClientConnectionHandler implements GameConnection {
         } catch (IOException e) {
             System.out.println("Failed to write to socket. " + this);
             closeResources();
-            server.removeHandler(clientId);//interrupt();
+            server.removeHandler(player);//interrupt();
         }
     }
 
@@ -98,6 +99,6 @@ public class ClientConnectionHandler implements GameConnection {
     }
 
     public String toString() {
-        return "Handler [id= " + clientId + "];";
+        return "Handler [player= " + player + "];";
     }
 }

@@ -7,9 +7,8 @@ public class Player {
     private int id;
     private String name;
 
-    public Player(int id, String name) {
+    public Player(int id) {
         this.id = id;
-        this.name = name;
     }
 
     public int getId() {
@@ -26,5 +25,22 @@ public class Player {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Player other = (Player) obj;
+        return other.id == this.id;
     }
 }

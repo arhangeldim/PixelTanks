@@ -37,24 +37,12 @@ public class Scene {
         return tileSize;
     }
 
-    public void setTileSize(int tileSize) {
-        this.tileSize = tileSize;
-    }
-
     public int getTiledWidth() {
         return tiledWidth;
     }
 
-    public void setTiledWidth(int tiledWidth) {
-        this.tiledWidth = tiledWidth;
-    }
-
     public int getTiledHeight() {
         return tiledHeight;
-    }
-
-    public void setTiledHeight(int tiledHeight) {
-        this.tiledHeight = tiledHeight;
     }
 
     // TODO: check this !
@@ -70,16 +58,8 @@ public class Scene {
         return width;
     }
 
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
     public int getHeight() {
         return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
     }
 
     private void generateScene() {
@@ -103,6 +83,7 @@ public class Scene {
     }
 
     public void addObject(int clientId, GameObject unit) {
+        logger.debug("Add an object: {}", unit);
         gameObjectMap.put(clientId, unit);
     }
 
