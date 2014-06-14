@@ -2,7 +2,6 @@ package arhangel.dim.pixeltank.game.scene;
 
 import arhangel.dim.pixeltank.game.GameObject;
 import arhangel.dim.pixeltank.game.GameObjectType;
-import arhangel.dim.pixeltank.game.Unit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +44,10 @@ public class Scene {
         return tiledHeight;
     }
 
-    // TODO: check this !
+    public Tile getTile(Position position) {
+        return getTile(position.x, position.y);
+    }
+
     public Tile getTile(int x, int y) {
         int xPos = (x) / tileSize;
         int yPos = (y) / tileSize;
@@ -133,11 +135,13 @@ public class Scene {
             GameObject gameObject = entry.getValue();
             if (gameObject.getType() == GameObjectType.UNIT) {
                 g.setColor(Color.BLUE);
+                gameObject.setSize(10);
             } else {
                 g.setColor(Color.MAGENTA);
+                gameObject.setSize(5);
             }
             Position pos = gameObject.getPosition();
-            g.fillRect(pos.x, pos.y, UNIT_SIZE, UNIT_SIZE);
+            g.fillRect(pos.x, pos.y, gameObject.getSize(), gameObject.getSize());
         }
     }
 }

@@ -2,6 +2,7 @@ package arhangel.dim.pixeltank.game.controller;
 
 import arhangel.dim.pixeltank.game.Direction;
 import arhangel.dim.pixeltank.game.GameObject;
+import arhangel.dim.pixeltank.game.GameObjectType;
 import arhangel.dim.pixeltank.game.Player;
 import arhangel.dim.pixeltank.game.RocketFactory;
 import arhangel.dim.pixeltank.game.TankFactory;
@@ -42,13 +43,14 @@ public class GameEventHandler {
     }
 
     public void move(Player player, Direction direction) {
+        logger.info("TEST: {}, {}", player, direction);
         GameObject unit = scene.getObject(player.getId());
         if (unit == null) {
             logger.warn("Unknown player: {}", player);
             return;
         }
         unit.setDirection(direction);
-        List<GameObject> deltas = detectCollision(unit);
+        List<GameObject> deltas = detectCollision(unit, direction);
         if (!deltas.isEmpty()) {
             for (GameEventListener l : listeners) {
                 // NOTE process for all elements in list
@@ -65,22 +67,21 @@ public class GameEventHandler {
         new Thread(new BulletTrace(bullet)).start();
     }
 
-    public List<GameObject> detectCollision(GameObject object) {
+    public List<GameObject> detectCollision(GameObject object, Direction direction) {
         List<GameObject> deltas = new ArrayList<>();
         Position pos = object.getPosition();
         // check new position
         int x = pos.x;
         int y = pos.y;
         int v = object.getVelocity();
-        Direction dir = object.getDirection();
         Tile tile1, tile2;
-        switch (dir) {
+        switch (direction) {
             case LEFT:
                 x -= v;
                 if (x < 0)
                     return deltas;
                 tile1 = scene.getTile(x, y);
-                tile2 = scene.getTile(x, y + object.getSize());
+                tile2 = scene.getTile(x, y + object.getSize() - 1);
                 if (tile1.isBlocked() || tile2.isBlocked())
                     return deltas;
                 break;
@@ -89,7 +90,7 @@ public class GameEventHandler {
                 if (x + object.getSize() > scene.getWidth())
                     return deltas;
                 tile1 = scene.getTile(x + object.getSize() - 1, y);
-                tile2 = scene.getTile(x + object.getSize() - 1, y + object.getSize());
+                tile2 = scene.getTile(x + object.getSize() - 1, y + object.getSize() - 1);
                 if (tile1.isBlocked() || tile2.isBlocked())
                     return deltas;
                 break;
@@ -98,7 +99,7 @@ public class GameEventHandler {
                 if (y < 0)
                     return deltas;
                 tile1 = scene.getTile(x, y);
-                tile2 = scene.getTile(x + object.getSize(), y);
+                tile2 = scene.getTile(x + object.getSize() - 1, y);
                 if (tile1.isBlocked() || tile2.isBlocked())
                     return deltas;
                 break;
@@ -107,16 +108,37 @@ public class GameEventHandler {
                 if (y + object.getSize() > scene.getHeight())
                     return deltas;
                 tile1 = scene.getTile(x, y + object.getSize() - 1);
-                tile2 = scene.getTile(x + object.getSize(), y + object.getSize() - 1);
+                tile2 = scene.getTile(x + object.getSize() - 1, y + object.getSize() - 1);
                 if (tile1.isBlocked() || tile2.isBlocked())
                     return deltas;
 
+        }
+
+        for (GameObject iter : scene.getAllObjects()) {
+            if (iter != object && intersect(object, iter)) {
+                logger.info("Intersection! {} <-> {}", object, iter);
+                if ((iter.getType() == GameObjectType.ROCKET && object.getType() == GameObjectType.UNIT)
+                        || (iter.getType() == GameObjectType.UNIT && object.getType() == GameObjectType.ROCKET)) {
+                    logger.info("Unit {} was killed by {}", object, iter.getPlayer());
+                }
+                return deltas;
+            }
         }
 
         pos.x = x;
         pos.y = y;
         deltas.add(object);
         return deltas;
+    }
+
+    // diagonal squares
+    public boolean intersect(int x1, int y1, int size1, int x2, int y2, int size2) {
+        return ((x1 >= x2) && (x1 <= x2 + size2) && (y1 >= y2) && (y1 <= y2 + size2))
+                || ((x2 >= x1) && (x2 <= x1 + size1) && (y2 >= y1) && (y2 <= y2 + size2));
+    }
+
+    private boolean intersect(GameObject o1, GameObject o2) {
+        return intersect(o1.getPosition().x, o1.getPosition().y, o1.getSize() - 1, o2.getPosition().x, o2.getPosition().y, o2.getSize() - 1);
     }
 
     class BulletTrace implements Runnable {
@@ -153,7 +175,7 @@ public class GameEventHandler {
                             break;
                     }
                     logger.info("Handle bullet: {}", bullet);
-                    List<GameObject> deltas = detectCollision(bullet);
+                    List<GameObject> deltas = detectCollision(bullet, bullet.getDirection());
                     if (!deltas.isEmpty()) {
                         for (GameEventListener l : listeners) {
                             l.onMove(bullet);
@@ -164,7 +186,7 @@ public class GameEventHandler {
                         return;
                     }
 
-                    TimeUnit.MILLISECONDS.sleep(500);
+                    TimeUnit.MILLISECONDS.sleep(200);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     Thread.currentThread().interrupt();

@@ -120,10 +120,12 @@ public class Unit extends GameObject {
     public String toString() {
         return "Unit{" +
                 "id=" + id +
+                ", type=" + type +
                 ", size=" + size +
                 ", direction=" + direction +
                 ", position=" + position +
                 ", velocity=" + velocity +
+                ", owner=" + player +
                 '}';
     }
 }

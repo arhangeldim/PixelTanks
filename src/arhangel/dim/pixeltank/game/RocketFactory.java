@@ -13,7 +13,7 @@ public class RocketFactory {
     private Scene scene;
     private static volatile RocketFactory instance;
     private static final int SIZE = 5;
-    private static final int VELOCITY = 10;
+    private static final int VELOCITY = 5;
 
     private RocketFactory(Scene scene) {
         this.scene = scene;
@@ -28,6 +28,7 @@ public class RocketFactory {
 
     public GameObject create(GameObject owner) {
         GameObject rocket = new Unit();
+        rocket.setPlayer(owner.getPlayer());
         rocket.setType(GameObjectType.ROCKET);
         rocket.setPosition(new Position(owner.getPosition().x, owner.getPosition().y));
         rocket.setDirection(owner.getDirection());
