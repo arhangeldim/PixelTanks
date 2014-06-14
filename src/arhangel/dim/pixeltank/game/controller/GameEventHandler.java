@@ -115,11 +115,20 @@ public class GameEventHandler {
         }
 
         for (GameObject iter : scene.getAllObjects()) {
-            if (iter != object && intersect(object, iter)) {
-                logger.info("Intersection! {} <-> {}", object, iter);
-                if ((iter.getType() == GameObjectType.ROCKET && object.getType() == GameObjectType.UNIT)
-                        || (iter.getType() == GameObjectType.UNIT && object.getType() == GameObjectType.ROCKET)) {
-                    logger.info("Unit {} was killed by {}", object, iter.getPlayer());
+            if (iter != object && intersect(x, y, object.getSize(), iter.getPosition().x, iter.getPosition().y, iter.getSize())) {
+                logger.info("Intersection! {}, ({},{}) <-> {}", object, x, y,iter);
+
+                if (iter.getType() == GameObjectType.ROCKET && object.getType() == GameObjectType.UNIT) {
+                    for (GameEventListener l : listeners) {
+                        l.onRocketHit(object);
+                    }
+                    break;
+                }
+                if (iter.getType() == GameObjectType.UNIT && object.getType() == GameObjectType.ROCKET) {
+                    for (GameEventListener l : listeners) {
+                        l.onRocketHit(iter);
+                    }
+                    break;
                 }
                 return deltas;
             }
@@ -131,14 +140,21 @@ public class GameEventHandler {
         return deltas;
     }
 
-    // diagonal squares
-    public boolean intersect(int x1, int y1, int size1, int x2, int y2, int size2) {
-        return ((x1 >= x2) && (x1 <= x2 + size2) && (y1 >= y2) && (y1 <= y2 + size2))
-                || ((x2 >= x1) && (x2 <= x1 + size1) && (y2 >= y1) && (y2 <= y2 + size2));
+    private boolean isPointIncluded(int px, int py, int x, int y, int size) {
+        boolean isIncluded =  ((px > x) && (px < x + size) && (py > y) && (py < y + size));
+        return isIncluded;
+    }
+    private boolean isPointIncludedBorders(int px, int py, int x, int y, int size) {
+        boolean isIncluded =  ((px >= x) && (px <= x + size) && (py >= y) && (py <= y + size));
+        return isIncluded;
     }
 
-    private boolean intersect(GameObject o1, GameObject o2) {
-        return intersect(o1.getPosition().x, o1.getPosition().y, o1.getSize() - 1, o2.getPosition().x, o2.getPosition().y, o2.getSize() - 1);
+    public boolean intersect(int x1, int y1, int size1, int x2, int y2, int size2) {
+        return isPointIncluded(x1, y1, x2, y2, size2)
+                || isPointIncluded(x1 + size1, y1, x2, y2, size2)
+                || isPointIncluded(x1, y1 + size1, x2, y2, size2)
+                || isPointIncluded(x1 + size1, y1 + size1, x2, y2, size2)
+                || isPointIncludedBorders(x1 + size1 / 2, y1 + size1 / 2, x2, y2, size2);
     }
 
     class BulletTrace implements Runnable {

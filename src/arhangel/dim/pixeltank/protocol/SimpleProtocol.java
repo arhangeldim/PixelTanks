@@ -6,6 +6,7 @@ import arhangel.dim.pixeltank.messages.FireMessage;
 import arhangel.dim.pixeltank.messages.LogonMessage;
 import arhangel.dim.pixeltank.messages.Message;
 import arhangel.dim.pixeltank.messages.MoveCommandMessage;
+import arhangel.dim.pixeltank.messages.RemoveMessage;
 import arhangel.dim.pixeltank.messages.SnapshotMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,6 +86,9 @@ public class SimpleProtocol implements Protocol {
                 break;
             case Message.MESSAGE_FIRE:
                 message = new FireMessage();
+                break;
+            case Message.MESSAGE_REMOVE:
+                message = new RemoveMessage();
                 break;
             default:
                 throw new MessageDecodingException("Unknown message type: " + type);

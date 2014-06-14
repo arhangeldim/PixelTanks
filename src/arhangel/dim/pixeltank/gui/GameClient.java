@@ -11,6 +11,7 @@ import arhangel.dim.pixeltank.messages.FireMessage;
 import arhangel.dim.pixeltank.messages.LogonMessage;
 import arhangel.dim.pixeltank.messages.Message;
 import arhangel.dim.pixeltank.messages.MoveCommandMessage;
+import arhangel.dim.pixeltank.messages.RemoveMessage;
 import arhangel.dim.pixeltank.messages.SnapshotMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,6 +130,15 @@ public class GameClient extends JFrame implements ConnectionListener {
                         scene.addObject(object.getId(), object);
                     }
                 }
+                repaint();
+                break;
+            case Message.MESSAGE_REMOVE:
+                if (!isLogged) {
+                    logger.error("Client is not logged");
+                    return;
+                }
+                RemoveMessage rmMessage = (RemoveMessage) message;
+                scene.removeObject(rmMessage.getObjectId());
                 repaint();
                 break;
             default:

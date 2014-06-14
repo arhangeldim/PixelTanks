@@ -7,6 +7,7 @@ import arhangel.dim.pixeltank.game.Unit;
 import arhangel.dim.pixeltank.game.scene.Scene;
 import arhangel.dim.pixeltank.messages.AckMessage;
 import arhangel.dim.pixeltank.messages.DeltaMessage;
+import arhangel.dim.pixeltank.messages.RemoveMessage;
 import arhangel.dim.pixeltank.messages.SnapshotMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +66,15 @@ public class OutputController implements GameEventListener {
             server.sendTo(player, new AckMessage(AckMessage.STATUS_FAILED));
             logger.warn("Failed to log on {}", player);
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onRocketHit(GameObject victim) {
+        try {
+            server.broadcast(new RemoveMessage(victim));
+        } catch(IOException e) {
             e.printStackTrace();
         }
     }
