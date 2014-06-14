@@ -138,7 +138,9 @@ public class GameClient extends JFrame implements ConnectionListener {
                     return;
                 }
                 RemoveMessage rmMessage = (RemoveMessage) message;
-                scene.removeObject(rmMessage.getObjectId());
+                for (Integer it : rmMessage.getObjectIds()) {
+                    scene.removeObject(it);
+                }
                 repaint();
                 break;
             default:

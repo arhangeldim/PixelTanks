@@ -102,8 +102,7 @@ public class SimpleProtocol implements Protocol {
     public void encode(DataOutputStream out, Message message) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(Header.HEADER_SIZE + message.getSize());
         Header header = new Header(VERSION, message.getSize());
-        logger.info("encode: {}, {}", header, message
-        );
+        logger.info("encode: {}, {}", header, message);
         header.packTo(buffer, 0);
         message.packTo(buffer, Header.HEADER_SIZE);
         out.write(buffer.array());

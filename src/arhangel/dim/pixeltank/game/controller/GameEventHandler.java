@@ -120,15 +120,13 @@ public class GameEventHandler {
 
                 if (iter.getType() == GameObjectType.ROCKET && object.getType() == GameObjectType.UNIT) {
                     for (GameEventListener l : listeners) {
-                        l.onRocketHit(object);
+                        l.onRocketHit(object, iter);
                     }
-                    break;
                 }
                 if (iter.getType() == GameObjectType.UNIT && object.getType() == GameObjectType.ROCKET) {
                     for (GameEventListener l : listeners) {
-                        l.onRocketHit(iter);
+                        l.onRocketHit(iter, object);
                     }
-                    break;
                 }
                 return deltas;
             }

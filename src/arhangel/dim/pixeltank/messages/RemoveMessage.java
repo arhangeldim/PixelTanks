@@ -3,46 +3,57 @@ package arhangel.dim.pixeltank.messages;
 import arhangel.dim.pixeltank.game.GameObject;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  */
 public class RemoveMessage extends Message {
 
-    private int id;
+    private List<Integer> ids;
 
-    public RemoveMessage() {}
-
-    public RemoveMessage(GameObject object) {
-        this.id = object.getId();
+    public RemoveMessage() {
+        ids = new ArrayList<>();
     }
 
-    public int getObjectId() {
-        return id;
+    public List<Integer> getObjectIds() {
+        return ids;
+    }
+
+    public void addObjectId(int id) {
+        ids.add(id);
     }
 
     @Override
     public int getSize() {
-        return 1 + 4;
+
+        return 1 + 4 + 4 * ids.size();
     }
 
     @Override
     public void packTo(ByteBuffer buffer, int pos) {
         buffer.position(pos);
         buffer.put(MESSAGE_REMOVE);
-        buffer.putInt(id);
+        buffer.putInt(ids.size());
+        for (Integer it : ids) {
+            buffer.putInt(it);
+        }
     }
 
     @Override
     public void unpack(ByteBuffer buffer) {
         type = buffer.get();
-        id = buffer.getInt();
+        int size = buffer.getInt();
+        for (int i = 0; i < size; i++) {
+            ids.add(buffer.getInt());
+        }
     }
 
     @Override
     public String toString() {
         return "RemoveMessage{" +
-                "objectId=" + id +
+                "objectIds=" + ids +
                 '}';
     }
 }

@@ -11,5 +11,5 @@ public interface GameEventListener {
     public void onMove(GameObject object);
     public void onLogon(Player player);
     public void onLogout(Player player);
-    public void onRocketHit(GameObject victim);
+    public void onRocketHit(GameObject victim, GameObject rocket);
 }
