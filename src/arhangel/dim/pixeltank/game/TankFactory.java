@@ -41,7 +41,7 @@ public class TankFactory implements GameObjectFactory {
         //
         tank.setPosition(getRandomPosition());
         tank.setVelocity(5);
-        tank.setSize(10);
+        tank.setSize(30);
         tank.setDirection(Direction.LEFT);
         tank.setId(player.getId());
 

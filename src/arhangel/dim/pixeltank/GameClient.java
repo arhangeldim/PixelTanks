@@ -1,4 +1,4 @@
-package arhangel.dim.pixeltank.gui;
+package arhangel.dim.pixeltank;
 
 import arhangel.dim.pixeltank.connection.ClientConnection;
 import arhangel.dim.pixeltank.connection.ConnectionListener;

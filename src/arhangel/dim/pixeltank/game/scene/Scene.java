@@ -2,6 +2,7 @@ package arhangel.dim.pixeltank.game.scene;
 
 import arhangel.dim.pixeltank.game.GameObject;
 import arhangel.dim.pixeltank.game.GameObjectType;
+import arhangel.dim.pixeltank.gui.ResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,7 @@ public class Scene {
 
     private static final int UNIT_SIZE = 20;
     private Map<Integer, GameObject> gameObjectMap = new HashMap<>();
+    private ResourceLoader resourceLoader;
 
     public Scene(int tiledWidth, int tiledHeight, int tileSize) {
         this.width = tileSize * tiledWidth;
@@ -30,6 +32,7 @@ public class Scene {
         this.tiledHeight = tiledHeight;
         tiles = new Tile[tiledWidth][tiledHeight];
         generateScene();
+        resourceLoader = ResourceLoader.getInstance();
     }
 
     public int getTileSize() {
@@ -133,15 +136,16 @@ public class Scene {
         //component.setBackground(groundTerrain.getTexture().getColor());
         for (Map.Entry<Integer, GameObject> entry : gameObjectMap.entrySet()) {
             GameObject gameObject = entry.getValue();
+            Position pos = gameObject.getPosition();
             if (gameObject.getType() == GameObjectType.UNIT) {
                 g.setColor(Color.BLUE);
-                gameObject.setSize(10);
+                gameObject.setSize(30);
+                g.drawImage(resourceLoader.getSpriteByDirection(gameObject), pos.x, pos.y, component);
             } else {
                 g.setColor(Color.MAGENTA);
                 gameObject.setSize(5);
+                g.fillRect(pos.x, pos.y, gameObject.getSize(), gameObject.getSize());
             }
-            Position pos = gameObject.getPosition();
-            g.fillRect(pos.x, pos.y, gameObject.getSize(), gameObject.getSize());
         }
     }
 }
