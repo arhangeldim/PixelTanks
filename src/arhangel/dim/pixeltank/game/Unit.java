@@ -94,8 +94,10 @@ public class Unit extends GameObject {
         int packed = 0;
 
         // TODO: collision with id possible because of sign reducing
-        packed |= (id & 0x7ff) << 1;
+
         packed |= (type == GameObjectType.ROCKET) ? 0x1 : 0x0;
+        packed |= (direction.getCode() & 0x3) << 1;
+        packed |= (id & 0x1ff) << 3;
         packed |= (position.x) << 12;
         packed |= (position.y) << 22;
         return packed;
@@ -109,7 +111,8 @@ public class Unit extends GameObject {
     public void unpack(long packed) {
         if (packed >= 0) {
             type = ((packed & 0x1) == 0x1) ? GameObjectType.ROCKET : GameObjectType.UNIT;
-            id = (short) ((packed >> 1) & 0x7ff);
+            direction = Direction.byCode((int) (packed >> 1) & 0x3);
+            id = (short) ((packed >> 3) & 0x1ff);
             int x = (int) ((packed >> 12) & 0x3ff);
             int y = (int) ((packed >> 22) & 0x3ff);
             position = new Position(x, y);
