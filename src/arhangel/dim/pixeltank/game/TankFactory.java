@@ -2,6 +2,7 @@ package arhangel.dim.pixeltank.game;
 
 import arhangel.dim.pixeltank.game.scene.Position;
 import arhangel.dim.pixeltank.game.scene.Scene;
+import arhangel.dim.pixeltank.util.SceneUtil;
 
 import java.util.Random;
 
@@ -11,6 +12,7 @@ import java.util.Random;
 public class TankFactory implements GameObjectFactory {
     private Scene scene;
     private Random random;
+    private static final int SIZE = 30;
     private static volatile TankFactory instance;
 
     private TankFactory(Scene scene) {
@@ -27,11 +29,22 @@ public class TankFactory implements GameObjectFactory {
 
     private Position getRandomPosition() {
         int x, y;
+        boolean intersect = false;
         do {
             x = random.nextInt(scene.getTiledWidth()) * scene.getTileSize();
             y = random.nextInt(scene.getTiledHeight()) * scene.getTileSize();
-        } while (scene.getTile(x, y).isBlocked());
+
+            // TODO: precompile areas, that are already blocked
+            for (GameObject o : scene.getAllObjects()) {
+                intersect |= SceneUtil.intersect(x, y, SIZE, o.getPosition().x, o.getPosition().y, o.getSize());
+            }
+        } while (scene.getTile(x, y).isBlocked() || intersect);
         return new Position(x, y);
+    }
+
+    private Direction getRandomDirection() {
+        int r = random.nextInt(4);
+        return Direction.byCode(r);
     }
 
     @Override
@@ -41,8 +54,8 @@ public class TankFactory implements GameObjectFactory {
         //
         tank.setPosition(getRandomPosition());
         tank.setVelocity(5);
-        tank.setSize(30);
-        tank.setDirection(Direction.LEFT);
+        tank.setSize(SIZE);
+        tank.setDirection(getRandomDirection());
         tank.setId(player.getId());
 
         scene.addObject(player.getId(), tank);

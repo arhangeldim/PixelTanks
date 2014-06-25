@@ -9,6 +9,7 @@ import arhangel.dim.pixeltank.game.TankFactory;
 import arhangel.dim.pixeltank.game.scene.Position;
 import arhangel.dim.pixeltank.game.scene.Scene;
 import arhangel.dim.pixeltank.game.scene.Tile;
+import arhangel.dim.pixeltank.util.SceneUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,8 +116,8 @@ public class GameEventHandler {
         }
 
         for (GameObject iter : scene.getAllObjects()) {
-            if (iter != object && intersect(x, y, object.getSize(), iter.getPosition().x, iter.getPosition().y, iter.getSize())) {
-                logger.info("Intersection! {}, ({},{}) <-> {}", object, x, y,iter);
+            if (iter != object && SceneUtil.intersect(x, y, object.getSize(), iter.getPosition().x, iter.getPosition().y, iter.getSize())) {
+                logger.info("Intersection! {}, ({},{}) <-> {}", object, x, y, iter);
 
                 if (iter.getType() == GameObjectType.ROCKET && object.getType() == GameObjectType.UNIT) {
                     for (GameEventListener l : listeners) {
@@ -136,23 +137,6 @@ public class GameEventHandler {
         pos.y = y;
         deltas.add(object);
         return deltas;
-    }
-
-    private boolean isPointIncluded(int px, int py, int x, int y, int size) {
-        boolean isIncluded =  ((px > x) && (px < x + size) && (py > y) && (py < y + size));
-        return isIncluded;
-    }
-    private boolean isPointIncludedBorders(int px, int py, int x, int y, int size) {
-        boolean isIncluded =  ((px >= x) && (px <= x + size) && (py >= y) && (py <= y + size));
-        return isIncluded;
-    }
-
-    public boolean intersect(int x1, int y1, int size1, int x2, int y2, int size2) {
-        return isPointIncluded(x1, y1, x2, y2, size2)
-                || isPointIncluded(x1 + size1, y1, x2, y2, size2)
-                || isPointIncluded(x1, y1 + size1, x2, y2, size2)
-                || isPointIncluded(x1 + size1, y1 + size1, x2, y2, size2)
-                || isPointIncludedBorders(x1 + size1 / 2, y1 + size1 / 2, x2, y2, size2);
     }
 
     class BulletTrace implements Runnable {
