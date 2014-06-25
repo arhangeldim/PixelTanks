@@ -20,7 +20,6 @@ public class Scene {
     private int tiledWidth, tiledHeight;
     private Tile[][] tiles;
 
-    private static final int UNIT_SIZE = 20;
     private Map<Integer, GameObject> gameObjectMap = new HashMap<>();
     private ResourceLoader resourceLoader;
 
@@ -55,7 +54,6 @@ public class Scene {
         int xPos = (x) / tileSize;
         int yPos = (y) / tileSize;
         Tile tile = tiles[xPos][yPos];
-        logger.info("({}, {}) -> {}", x, y, tile);
         return tile;
     }
 
