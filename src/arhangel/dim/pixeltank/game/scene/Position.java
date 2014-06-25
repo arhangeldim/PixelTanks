@@ -11,6 +11,11 @@ public class Position {
         this.y = y;
     }
 
+    public Position(Position position) {
+        this.x = position.x;
+        this.y = position.y;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null)
@@ -29,7 +34,7 @@ public class Position {
         int hash = 37;
         hash = 31 * hash + x;
         hash = 31 * hash + y;
-        return  hash;
+        return hash;
     }
 
     @Override

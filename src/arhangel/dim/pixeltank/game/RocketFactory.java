@@ -30,8 +30,33 @@ public class RocketFactory {
         GameObject rocket = new Unit();
         rocket.setPlayer(owner.getPlayer());
         rocket.setType(GameObjectType.ROCKET);
-        rocket.setPosition(new Position(owner.getPosition().x, owner.getPosition().y));
-        rocket.setDirection(owner.getDirection());
+
+        Direction dir = owner.getDirection();
+        rocket.setDirection(dir);
+        Position pos = new Position(owner.getPosition());
+        // center
+        int full = owner.getSize();
+        int half = owner.getSize() / 2;
+
+        switch (dir) {
+            case UP:
+                pos.x += half;
+                pos.y -= SIZE;
+                break;
+            case RIGHT:
+                pos.x += full;
+                pos.y += half;
+                break;
+            case DOWN:
+                pos.x += half;
+                pos.y += full;
+                break;
+            case LEFT:
+                pos.x -= SIZE;
+                pos.y += half;
+                break;
+        }
+        rocket.setPosition(pos);
         rocket.setVelocity(VELOCITY);
         rocket.setSize(SIZE);
         rocket.setId(idGenerator.getAndIncrement());

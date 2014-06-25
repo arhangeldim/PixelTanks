@@ -142,9 +142,10 @@ public class Scene {
                 gameObject.setSize(30);
                 g.drawImage(resourceLoader.getSpriteByDirection(gameObject), pos.x, pos.y, component);
             } else {
-                g.setColor(Color.MAGENTA);
+                // rocket
+                g.setColor(Color.RED);
                 gameObject.setSize(5);
-                g.fillRect(pos.x, pos.y, gameObject.getSize(), gameObject.getSize());
+                g.fillOval(pos.x, pos.y, gameObject.getSize(), gameObject.getSize());
             }
         }
     }
