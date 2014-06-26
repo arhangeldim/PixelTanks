@@ -13,6 +13,7 @@ public abstract class Message {
     public static final byte MESSAGE_DELTA = 4;
     public static final byte MESSAGE_FIRE = 5;
     public static final byte MESSAGE_REMOVE = 6;
+    public static final byte MESSAGE_LIFECYCLE = 7;
 
     private int senderId;
     private Player player;

@@ -7,6 +7,7 @@ import arhangel.dim.pixeltank.game.Unit;
 import arhangel.dim.pixeltank.game.scene.Scene;
 import arhangel.dim.pixeltank.messages.AckMessage;
 import arhangel.dim.pixeltank.messages.DeltaMessage;
+import arhangel.dim.pixeltank.messages.LifecycleMessage;
 import arhangel.dim.pixeltank.messages.RemoveMessage;
 import arhangel.dim.pixeltank.messages.SnapshotMessage;
 import org.slf4j.Logger;
@@ -51,10 +52,30 @@ public class OutputController implements GameEventListener {
     }
 
     @Override
-    public void onLogon(Player player) {
+    public void onFire(Player player, GameObject object) {
+        try {
+            LifecycleMessage spawnMessage = new LifecycleMessage();
+            spawnMessage.setStage(LifecycleMessage.SPAWNED);
+            spawnMessage.setPlayer(player);
+            spawnMessage.setObject(object);
+            server.broadcast(spawnMessage);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onLogon(Player player, GameObject unit) {
         try {
             server.sendTo(player, new AckMessage(AckMessage.STATUS_SUCCESS));
             server.sendTo(player, new SnapshotMessage(scene));
+
+            LifecycleMessage spawnMessage = new LifecycleMessage();
+            spawnMessage.setStage(LifecycleMessage.SPAWNED);
+            spawnMessage.setPlayer(player);
+            spawnMessage.setObject(unit);
+            server.broadcast(spawnMessage);
+
         } catch (IOException e) {
             e.printStackTrace();
         }

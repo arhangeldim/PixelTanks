@@ -3,6 +3,7 @@ package arhangel.dim.pixeltank.protocol;
 import arhangel.dim.pixeltank.messages.AckMessage;
 import arhangel.dim.pixeltank.messages.DeltaMessage;
 import arhangel.dim.pixeltank.messages.FireMessage;
+import arhangel.dim.pixeltank.messages.LifecycleMessage;
 import arhangel.dim.pixeltank.messages.LogonMessage;
 import arhangel.dim.pixeltank.messages.Message;
 import arhangel.dim.pixeltank.messages.MoveCommandMessage;
@@ -89,6 +90,9 @@ public class SimpleProtocol implements Protocol {
                 break;
             case Message.MESSAGE_REMOVE:
                 message = new RemoveMessage();
+                break;
+            case Message.MESSAGE_LIFECYCLE:
+                message = new LifecycleMessage();
                 break;
             default:
                 throw new MessageDecodingException("Unknown message type: " + type);

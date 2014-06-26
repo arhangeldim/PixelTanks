@@ -8,6 +8,7 @@ import arhangel.dim.pixeltank.game.scene.Scene;
 import arhangel.dim.pixeltank.messages.AckMessage;
 import arhangel.dim.pixeltank.messages.DeltaMessage;
 import arhangel.dim.pixeltank.messages.FireMessage;
+import arhangel.dim.pixeltank.messages.LifecycleMessage;
 import arhangel.dim.pixeltank.messages.LogonMessage;
 import arhangel.dim.pixeltank.messages.Message;
 import arhangel.dim.pixeltank.messages.MoveCommandMessage;
@@ -123,12 +124,7 @@ public class GameClient extends JFrame implements ConnectionListener {
                 }
                 DeltaMessage deltaMessage = (DeltaMessage) message;
                 for (GameObject object : deltaMessage.getDeltaObjects()) {
-
-                    // TODO: have to generate new message(added new player) instead of adding
-                    // broadcast logon info about new users
-                    if (!scene.updateObject(object.getId(), object)) {
-                        scene.addObject(object.getId(), object);
-                    }
+                    scene.updateObject(object.getId(), object);
                 }
                 repaint();
                 break;
@@ -141,6 +137,17 @@ public class GameClient extends JFrame implements ConnectionListener {
                 for (Integer it : rmMessage.getObjectIds()) {
                     scene.removeObject(it);
                 }
+                repaint();
+                break;
+            case Message.MESSAGE_LIFECYCLE:
+                if (!isLogged) {
+                    logger.error("Client is not logged");
+                    return;
+                }
+                LifecycleMessage lifecycleMessage = (LifecycleMessage) message;
+                GameObject object = lifecycleMessage.getObject();
+                scene.addObject(object.getId(), object);
+                logger.info("Player logged on {}", lifecycleMessage.getPlayer().getName());
                 repaint();
                 break;
             default:

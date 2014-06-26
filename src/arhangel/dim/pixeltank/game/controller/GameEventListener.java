@@ -9,7 +9,12 @@ import arhangel.dim.pixeltank.game.Player;
 public interface GameEventListener {
 
     public void onMove(GameObject object);
-    public void onLogon(Player player);
+
+    public void onFire(Player player, GameObject unit);
+
+    public void onLogon(Player player, GameObject unit);
+
     public void onLogout(Player player);
+
     public void onRocketHit(GameObject victim, GameObject rocket);
 }

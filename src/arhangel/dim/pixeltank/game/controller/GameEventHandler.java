@@ -32,9 +32,10 @@ public class GameEventHandler {
         if (player == null) {
             throw new RuntimeException("Unexpected value");
         }
-        if (tankFactory.create(player) != null) {
+        GameObject unit = tankFactory.create(player);
+        if (unit != null) {
             for (GameEventListener l : listeners) {
-                l.onLogon(player);
+                l.onLogon(player, unit);
             }
         } else {
             for (GameEventListener l : listeners) {
@@ -65,6 +66,9 @@ public class GameEventHandler {
         logger.info("Fire on dir: {}", owner.getDirection());
         GameObject bullet = rocketFactory.create(owner);
         scene.addObject(bullet.getId(), bullet);
+        for (GameEventListener l : listeners) {
+            l.onFire(player, bullet);
+        }
         new Thread(new BulletTrace(bullet)).start();
     }
 
@@ -172,7 +176,6 @@ public class GameEventHandler {
                             pos.y += v;
                             break;
                     }
-                    logger.info("Handle bullet: {}", bullet);
                     List<GameObject> deltas = detectCollision(bullet, bullet.getDirection());
                     if (!deltas.isEmpty()) {
                         for (GameEventListener l : listeners) {
