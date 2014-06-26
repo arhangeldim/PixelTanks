@@ -40,8 +40,7 @@ public class ClientConnection implements GameConnection {
     public void start() throws IOException {
         connectionThread = new ClientThread();
         connectionThread.setName("Client-connection handler");
-        connectionThread.start();//TODO: test
-        send(new LogonMessage("Dima"));
+        connectionThread.start();
     }
 
     public void stop() {

@@ -5,6 +5,8 @@ import arhangel.dim.pixeltank.connection.ConnectionListener;
 import arhangel.dim.pixeltank.game.Direction;
 import arhangel.dim.pixeltank.game.GameObject;
 import arhangel.dim.pixeltank.game.scene.Scene;
+import arhangel.dim.pixeltank.gui.GameFrame;
+import arhangel.dim.pixeltank.gui.LogonFrame;
 import arhangel.dim.pixeltank.messages.AckMessage;
 import arhangel.dim.pixeltank.messages.DeltaMessage;
 import arhangel.dim.pixeltank.messages.FireMessage;
@@ -19,80 +21,74 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 
 /****/
-public class GameClient extends JFrame implements ConnectionListener {
+public class GameClient implements ConnectionListener {
     Logger logger = LoggerFactory.getLogger(GameClient.class);
-    public static final int CANVAS_WIDTH = 600;
-    public static final int CANVAS_HEIGHT = 500;
     private Scene scene;
-    private DrawCanvas canvas;
     private ClientConnection clientConnection;
     private volatile boolean isLogged = false;
 
-    public GameClient() throws Exception {
-        JPanel btnPanel = new JPanel(new FlowLayout());
-        JButton btnLeft = new JButton("Login");
-        btnPanel.add(btnLeft);
-        btnLeft.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    clientConnection.send(new LogonMessage("User"));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+    private JFrame loginFrame;
+    private GameFrame gameFrame;
+
+    public GameClient() {
+        loginFrame = new LogonFrame(this);
+    }
+
+    public void handleInput(int keyCode) {
+        try {
+            switch (keyCode) {
+                case KeyEvent.VK_LEFT:
+                    Message m = new MoveCommandMessage(Direction.LEFT);
+                    clientConnection.send(m);
+                    break;
+                case KeyEvent.VK_RIGHT:
+                    m = new MoveCommandMessage(Direction.RIGHT);
+                    clientConnection.send(m);
+                    break;
+                case KeyEvent.VK_DOWN:
+                    m = new MoveCommandMessage(Direction.DOWN);
+                    clientConnection.send(m);
+                    break;
+                case KeyEvent.VK_UP:
+                    m = new MoveCommandMessage(Direction.UP);
+                    clientConnection.send(m);
+                    break;
+                case KeyEvent.VK_SPACE:
+                    m = new FireMessage();
+                    clientConnection.send(m);
+                    break;
             }
-        });// Set up a custom drawing
-        canvas = new DrawCanvas();
-        canvas.setPreferredSize(new Dimension(CANVAS_WIDTH, CANVAS_HEIGHT));
-        Container cp = getContentPane();
-        cp.setLayout(new BorderLayout());
-        cp.add(canvas, BorderLayout.CENTER);
-        int serverPort = 19000;
-        String address = "127.0.0.1";
-        clientConnection = new ClientConnection(address, serverPort);
-        clientConnection.addConnectionListener(this);
-        clientConnection.start();// "this" JFrame fires KeyEvent
-        addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent evt) {
-                try {
-                    switch (evt.getKeyCode()) {
-                        case KeyEvent.VK_LEFT:
-                            Message m = new MoveCommandMessage(Direction.LEFT);
-                            clientConnection.send(m);//x1 -= 5;repaint();
-                            break;
-                        case KeyEvent.VK_RIGHT:
-                            m = new MoveCommandMessage(Direction.RIGHT);
-                            clientConnection.send(m);//x1 += 10;repaint();
-                            break;
-                        case KeyEvent.VK_DOWN:
-                            m = new MoveCommandMessage(Direction.DOWN);
-                            clientConnection.send(m);//y1 += 10;repaint();
-                            break;
-                        case KeyEvent.VK_UP:
-                            m = new MoveCommandMessage(Direction.UP);
-                            clientConnection.send(m);//y1 -= 10;repaint();
-                            break;
-                        case KeyEvent.VK_SPACE:
-                            m = new FireMessage();
-                            clientConnection.send(m);
-                            break;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Handle the CLOSE button
-        setTitle("Move a Square");
-        pack(); // packTo all the components in the JFrame
-        setVisible(true); // show it
-        requestFocus(); // set the focus to JFrame to receive KeyEvent
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public Scene getScene() {
+        return scene;
+    }
+
+    public void login(String host, String port, String login) {
+        try {
+            clientConnection = new ClientConnection(host, Integer.valueOf(port));
+            clientConnection.addConnectionListener(this);
+            clientConnection.start();
+            clientConnection.send(new LogonMessage(login));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createScene() {
+        logger.info("Creating scene...");
+        loginFrame.setVisible(false);
+        gameFrame = new GameFrame(this);
+
     }
 
     @Override
@@ -103,6 +99,7 @@ public class GameClient extends JFrame implements ConnectionListener {
                 AckMessage ackMessage = (AckMessage) message;
                 if (ackMessage.getStatus() == AckMessage.STATUS_SUCCESS) {
                     isLogged = true;
+                    createScene();
                 } else {
                     logger.error("Failed to logon");
                 }
@@ -114,8 +111,8 @@ public class GameClient extends JFrame implements ConnectionListener {
                 }
                 SnapshotMessage snapshotMessage = (SnapshotMessage) message;
                 scene = snapshotMessage.getScene();
-                canvas.setPreferredSize(new Dimension(scene.getWidth(), scene.getHeight()));
-                repaint();
+                gameFrame.getCanvas().setPreferredSize(new Dimension(scene.getWidth(), scene.getHeight()));
+                gameFrame.getCanvas().repaint();
                 break;
             case Message.MESSAGE_DELTA:
                 if (!isLogged) {
@@ -126,7 +123,7 @@ public class GameClient extends JFrame implements ConnectionListener {
                 for (GameObject object : deltaMessage.getDeltaObjects()) {
                     scene.updateObject(object.getId(), object);
                 }
-                repaint();
+                gameFrame.getCanvas().repaint();
                 break;
             case Message.MESSAGE_REMOVE:
                 if (!isLogged) {
@@ -137,7 +134,7 @@ public class GameClient extends JFrame implements ConnectionListener {
                 for (Integer it : rmMessage.getObjectIds()) {
                     scene.removeObject(it);
                 }
-                repaint();
+                gameFrame.getCanvas().repaint();
                 break;
             case Message.MESSAGE_LIFECYCLE:
                 if (!isLogged) {
@@ -146,34 +143,15 @@ public class GameClient extends JFrame implements ConnectionListener {
                 }
                 LifecycleMessage lifecycleMessage = (LifecycleMessage) message;
                 GameObject object = lifecycleMessage.getObject();
+                logger.info("Spawned an object {} by player {}", object, lifecycleMessage.getPlayer().getName());
                 scene.addObject(object.getId(), object);
-                logger.info("Player logged on {}", lifecycleMessage.getPlayer().getName());
-                repaint();
+                gameFrame.getCanvas().repaint();
                 break;
             default:
         }
     }
 
-    class DrawCanvas extends JPanel {
-        @Override
-        public void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            if (scene != null) {
-                scene.paint(this, g);
-            }
-        }
-    }
-
-    public static void main(String[] args) {// Run GUI codes on the Event-Dispatcher Thread for thread safety
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    new GameClient(); // Let the constructor do the job
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+    public static void main(String[] args) {
+        new GameClient();
     }
 }
