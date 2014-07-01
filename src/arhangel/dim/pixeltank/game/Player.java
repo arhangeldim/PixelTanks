@@ -6,9 +6,18 @@ package arhangel.dim.pixeltank.game;
 public class Player {
     private int id;
     private String name;
+    private boolean isAlive;
 
     public Player(int id) {
         this.id = id;
+    }
+
+    public boolean isAlive() {
+        return isAlive;
+    }
+
+    public void setAlive(boolean isAlive) {
+        this.isAlive = isAlive;
     }
 
     public int getId() {

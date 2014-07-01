@@ -132,6 +132,7 @@ public class GameClient implements ConnectionListener {
                 }
                 RemoveMessage rmMessage = (RemoveMessage) message;
                 for (Integer it : rmMessage.getObjectIds()) {
+                    logger.info("Removed an object: {}", scene.getObject(it));
                     scene.removeObject(it);
                 }
                 gameFrame.getCanvas().repaint();

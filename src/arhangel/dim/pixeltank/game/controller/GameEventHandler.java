@@ -10,6 +10,7 @@ import arhangel.dim.pixeltank.game.scene.Position;
 import arhangel.dim.pixeltank.game.scene.Scene;
 import arhangel.dim.pixeltank.game.scene.Tile;
 import arhangel.dim.pixeltank.util.SceneUtil;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,10 +29,7 @@ public class GameEventHandler {
     private RocketFactory rocketFactory;
     private TankFactory tankFactory;
 
-    public void logon(Player player) {
-        if (player == null) {
-            throw new RuntimeException("Unexpected value");
-        }
+    public void logon(@NotNull Player player) {
         GameObject unit = tankFactory.create(player);
         if (unit != null) {
             for (GameEventListener l : listeners) {
@@ -44,8 +42,7 @@ public class GameEventHandler {
         }
     }
 
-    public void move(Player player, Direction direction) {
-        logger.info("TEST: {}, {}", player, direction);
+    public void move(@NotNull Player player, Direction direction) {
         GameObject unit = scene.getObject(player.getId());
         if (unit == null) {
             logger.warn("Unknown player: {}", player);
@@ -61,7 +58,7 @@ public class GameEventHandler {
         }
     }
 
-    public void fire(Player player) {
+    public void fire(@NotNull Player player) {
         GameObject owner = scene.getObject(player.getId());
         logger.info("Fire on dir: {}", owner.getDirection());
         GameObject bullet = rocketFactory.create(owner);
@@ -72,74 +69,79 @@ public class GameEventHandler {
         new Thread(new BulletTrace(bullet)).start();
     }
 
-    public List<GameObject> detectCollision(GameObject object, Direction direction) {
-        List<GameObject> deltas = new ArrayList<>();
-        Position pos = object.getPosition();
-        // check new position
-        int x = pos.x;
-        int y = pos.y;
-        int v = object.getVelocity();
+    private Position validatePosition(Position position, Direction direction, int velocity, int size) {
+        Position newPos = new Position(position);
+        int x = position.x;
+        int y = position.y;
         Tile tile1, tile2;
         switch (direction) {
             case LEFT:
-                x -= v;
+                x -= velocity;
                 if (x < 0)
-                    return deltas;
+                    return position;
                 tile1 = scene.getTile(x, y);
-                tile2 = scene.getTile(x, y + object.getSize() - 1);
+                tile2 = scene.getTile(x, y + size - 1);
                 if (tile1.isBlocked() || tile2.isBlocked())
-                    return deltas;
+                    return position;
                 break;
             case RIGHT:
-                x += v;
-                if (x + object.getSize() > scene.getWidth())
-                    return deltas;
-                tile1 = scene.getTile(x + object.getSize() - 1, y);
-                tile2 = scene.getTile(x + object.getSize() - 1, y + object.getSize() - 1);
+                x += velocity;
+                if (x + size > scene.getWidth())
+                    return position;
+                tile1 = scene.getTile(x + size - 1, y);
+                tile2 = scene.getTile(x + size - 1, y + size - 1);
                 if (tile1.isBlocked() || tile2.isBlocked())
-                    return deltas;
+                    return position;
                 break;
             case UP:
-                y -= v;
+                y -= velocity;
                 if (y < 0)
-                    return deltas;
+                    return position;
                 tile1 = scene.getTile(x, y);
-                tile2 = scene.getTile(x + object.getSize() - 1, y);
+                tile2 = scene.getTile(x + size - 1, y);
                 if (tile1.isBlocked() || tile2.isBlocked())
-                    return deltas;
+                    return position;
                 break;
             case DOWN:
-                y += v;
-                if (y + object.getSize() > scene.getHeight())
-                    return deltas;
-                tile1 = scene.getTile(x, y + object.getSize() - 1);
-                tile2 = scene.getTile(x + object.getSize() - 1, y + object.getSize() - 1);
+                y += velocity;
+                if (y + size > scene.getHeight())
+                    return position;
+                tile1 = scene.getTile(x, y + size - 1);
+                tile2 = scene.getTile(x + size - 1, y + size - 1);
                 if (tile1.isBlocked() || tile2.isBlocked())
-                    return deltas;
+                    return position;
 
         }
+        newPos.x = x;
+        newPos.y = y;
+        return newPos;
+    }
 
-        for (GameObject iter : scene.getAllObjects()) {
-            if (iter != object && SceneUtil.intersect(x, y, object.getSize(), iter.getPosition().x, iter.getPosition().y, iter.getSize())) {
-                logger.info("Intersection! {}, ({},{}) <-> {}", object, x, y, iter);
+    public List<GameObject> detectCollision(GameObject object, Direction direction) {
+        List<GameObject> deltas = new ArrayList<>();
+        Position pos = object.getPosition();
+        Position newPos = validatePosition(pos, direction, object.getVelocity(), object.getSize());
 
-                if (iter.getType() == GameObjectType.ROCKET && object.getType() == GameObjectType.UNIT) {
+        for (GameObject other : scene.getAllObjects()) {
+            if (other != object && SceneUtil.intersect(newPos, object.getSize(), other.getPosition(), other.getSize())) {
+                if ((other.getType() == GameObjectType.ROCKET && object.getType() == GameObjectType.UNIT)
+                        || (other.getType() == GameObjectType.UNIT && object.getType() == GameObjectType.ROCKET)) {
+                    // remove objects from scene
+
+                    scene.removeObject(object.getId());
+                    scene.removeObject(other.getId());
                     for (GameEventListener l : listeners) {
-                        l.onRocketHit(object, iter);
-                    }
-                }
-                if (iter.getType() == GameObjectType.UNIT && object.getType() == GameObjectType.ROCKET) {
-                    for (GameEventListener l : listeners) {
-                        l.onRocketHit(iter, object);
+                        l.onKill(object.getPlayer(), object);
+                        l.onKill(other.getPlayer(), other);
                     }
                 }
                 return deltas;
             }
         }
-
-        pos.x = x;
-        pos.y = y;
-        deltas.add(object);
+        if (!newPos.equals(pos)) {
+            object.setPosition(newPos);
+            deltas.add(object);
+        }
         return deltas;
     }
 
@@ -153,7 +155,11 @@ public class GameEventHandler {
 
         private void removeBullet() {
             logger.info("Remove bullet from scene: {}", bullet);
+
             scene.removeObject(bullet.getId());
+            for (GameEventListener l : listeners) {
+                l.onKill(bullet.getPlayer(), bullet);
+            }
         }
 
         @Override

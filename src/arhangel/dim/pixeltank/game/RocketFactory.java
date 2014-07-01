@@ -12,7 +12,7 @@ public class RocketFactory {
     private static AtomicInteger idGenerator = new AtomicInteger(50);
     private Scene scene;
     private static volatile RocketFactory instance;
-    private static final int SIZE = 5;
+    private static final int SIZE = 10;
     private static final int VELOCITY = 5;
 
     private RocketFactory(Scene scene) {

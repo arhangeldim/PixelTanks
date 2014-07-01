@@ -142,7 +142,7 @@ public class Scene {
             } else {
                 // rocket
                 g.setColor(Color.RED);
-                gameObject.setSize(5);
+                gameObject.setSize(10);
                 g.fillOval(pos.x, pos.y, gameObject.getSize(), gameObject.getSize());
             }
         }

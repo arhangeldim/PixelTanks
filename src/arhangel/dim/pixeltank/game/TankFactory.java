@@ -3,6 +3,7 @@ package arhangel.dim.pixeltank.game;
 import arhangel.dim.pixeltank.game.scene.Position;
 import arhangel.dim.pixeltank.game.scene.Scene;
 import arhangel.dim.pixeltank.util.SceneUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
@@ -48,7 +49,7 @@ public class TankFactory implements GameObjectFactory {
     }
 
     @Override
-    public GameObject create(Player player) {
+    public GameObject create(@NotNull Player player) {
         GameObject tank = new Unit(player);
         tank.setType(GameObjectType.UNIT);
         //

@@ -92,13 +92,11 @@ public class OutputController implements GameEventListener {
     }
 
     @Override
-    public void onRocketHit(GameObject victim, GameObject rocket) {
+    public void onKill(Player player, GameObject object) {
         try {
-            logger.info("Player {} was killed by player {}", victim.getPlayer(), rocket.getPlayer());
+            logger.info("onKill() {}, {}", player, object);
             RemoveMessage msg = new RemoveMessage();
-            msg.addObjectId(victim.getId());
-            msg.addObjectId(rocket.getId());
-
+            msg.addObjectId(object.getId());
             server.broadcast(msg);
         } catch(IOException e) {
             e.printStackTrace();
