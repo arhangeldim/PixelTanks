@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -88,7 +89,7 @@ public class Scene {
     }
 
     public Collection<GameObject> getAllObjects() {
-        return gameObjectMap.values();
+        return Collections.unmodifiableCollection(gameObjectMap.values());
     }
 
     public GameObject getObject(int id) {
@@ -124,8 +125,9 @@ public class Scene {
             }
         }
 
-        for (Map.Entry<Integer, GameObject> entry : gameObjectMap.entrySet()) {
-            GameObject gameObject = entry.getValue();
+        Collection<Map.Entry<Integer, GameObject>> scene = Collections.unmodifiableCollection(gameObjectMap.entrySet());
+        scene.forEach(e -> {
+            GameObject gameObject = e.getValue();
             Position pos = gameObject.getPosition();
             if (gameObject.getType() == GameObjectType.UNIT) {
                 g.setColor(Color.BLUE);
@@ -137,6 +139,7 @@ public class Scene {
                 gameObject.setSize(10);
                 g.fillOval(pos.x, pos.y, gameObject.getSize(), gameObject.getSize());
             }
-        }
+        });
+
     }
 }

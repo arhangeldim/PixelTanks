@@ -95,7 +95,6 @@ public class GameServer {
     public void broadcast(Message message) throws IOException {
         if (message == null)
             throw new RuntimeException("Invalid message");
-        logger.info("Broadcast: {}", message);
         for (Map.Entry<Player, GameConnection> entry : handlers.entrySet()) {
             entry.getValue().send(message);
         }
