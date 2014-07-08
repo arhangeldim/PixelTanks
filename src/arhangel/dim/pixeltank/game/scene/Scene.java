@@ -2,6 +2,8 @@ package arhangel.dim.pixeltank.game.scene;
 
 import arhangel.dim.pixeltank.game.GameObject;
 import arhangel.dim.pixeltank.game.GameObjectType;
+import arhangel.dim.pixeltank.gui.ImageMapGenerator;
+import arhangel.dim.pixeltank.gui.MapGenerator;
 import arhangel.dim.pixeltank.gui.ResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,8 @@ public class Scene {
 
     private Map<Integer, GameObject> gameObjectMap = new HashMap<>();
     private ResourceLoader resourceLoader;
+    private MapGenerator mapGenerator;
+
 
     public Scene(int tiledWidth, int tiledHeight, int tileSize) {
         this.width = tileSize * tiledWidth;
@@ -30,8 +34,9 @@ public class Scene {
         this.tiledWidth = tiledWidth;
         this.tiledHeight = tiledHeight;
         tiles = new Tile[tiledWidth][tiledHeight];
-        generateScene();
         resourceLoader = ResourceLoader.getInstance();
+        mapGenerator = new ImageMapGenerator(resourceLoader);
+        tiles = mapGenerator.generateMap(width, height, tileSize);
     }
 
     public int getTileSize() {
@@ -63,18 +68,6 @@ public class Scene {
 
     public int getHeight() {
         return height;
-    }
-
-    private void generateScene() {
-        tiles = new Tile[width][height];
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                tiles[i][j] = new Tile(tileSize, i, j, false);
-            }
-        }
-        for (int i = 3; i < 7; i++) {
-            tiles[i][4].isBlocked = true;
-        }
     }
 
     public boolean updateObject(int id, GameObject unit) {
@@ -131,7 +124,6 @@ public class Scene {
             }
         }
 
-        //component.setBackground(groundTerrain.getTexture().getColor());
         for (Map.Entry<Integer, GameObject> entry : gameObjectMap.entrySet()) {
             GameObject gameObject = entry.getValue();
             Position pos = gameObject.getPosition();

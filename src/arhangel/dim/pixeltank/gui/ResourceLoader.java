@@ -3,7 +3,6 @@ package arhangel.dim.pixeltank.gui;
 import arhangel.dim.pixeltank.Game;
 import arhangel.dim.pixeltank.game.Direction;
 import arhangel.dim.pixeltank.game.GameObject;
-import arhangel.dim.pixeltank.game.GameObjectType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,14 +21,21 @@ public class ResourceLoader {
     private BufferedImage[] tankSprites = null;
     private static ResourceLoader instance;
 
+    private static final String TANK_SPRITE_RESOURCE = "tank_sprite.png";
+
     private ResourceLoader() {
         logger.info("Initialize ResourceLoader");
-        tankSprites = new BufferedImage[4];
-        BufferedImage spriteRight = loadImageFromResources(Game.class, "tank_sprite.png");
-        tankSprites[0] = spriteRight;
-        tankSprites[1] = rotateImage(spriteRight, 90); // down
-        tankSprites[2] = rotateImage(spriteRight, 180); // left
-        tankSprites[3] = rotateImage(spriteRight, 270); //top
+        try {
+            tankSprites = new BufferedImage[4];
+            BufferedImage spriteRight = loadImageFromResources(Game.class, TANK_SPRITE_RESOURCE);
+            tankSprites[0] = spriteRight;
+            tankSprites[1] = rotateImage(spriteRight, 90); // down
+            tankSprites[2] = rotateImage(spriteRight, 180); // left
+            tankSprites[3] = rotateImage(spriteRight, 270); //top
+        } catch(IOException e) {
+            logger.warn("Failed to load resource: {}\n{}", TANK_SPRITE_RESOURCE, e);
+        }
+
     }
 
     public static synchronized ResourceLoader getInstance() {
@@ -59,14 +65,8 @@ public class ResourceLoader {
         return null;
     }
 
-    private BufferedImage loadImageFromResources(Class holder, String path) {
-        BufferedImage image = null;
-        try {
-            image = ImageIO.read(holder.getResource(path));
-        } catch (IOException e) {
-            logger.error("Failed to load image {} from resources {}", path, holder.getName());
-        }
-        return image;
+    public BufferedImage loadImageFromResources(Class holder, String path) throws IOException {
+        return ImageIO.read(holder.getResource(path));
     }
 
     private BufferedImage rotateImage(BufferedImage image, double angle) {
